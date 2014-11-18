@@ -1,0 +1,6 @@
+'MSVBVM60.rtcStrReverse
+Public Declare Function rtcStrReverse Lib "MSVBVM60" (ByVal sStr As String) As String
+
+Public Function Alternative_StrReverse(ByVal sStr As String) As String
+Alternative_StrReverse = StrConv(rtcStrReverse(StrConv(sStr, vbUnicode)), vbFromUnicode)
+End Function

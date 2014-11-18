@@ -1,0 +1,27 @@
+Public Function AltString(ByVal Number As Long, ByVal Character As Integer) As String
+    Dim bArr()  As Byte
+    Dim Byte1   As Byte
+    Dim Byte2   As Byte
+    Dim ubArr   As Long
+    Dim i       As Long
+ 
+    If Number <= 0 Then AltString = vbNullString: Exit Function
+ 
+    ReDim bArr((Number * 2) - 1) ' *2 for unicode, -1 for array
+    ubArr = UBound(bArr) ' Highest possible number in array
+   
+    If Character > &HFF Then ' If character is unicode
+        Byte1 = Character Mod &H100
+        Byte2 = CInt(Character / &H100)
+    Else ' If character is ANSI
+        Byte1 = Character ' ANSI character
+        Byte2 = 0 ' Null character
+    End If
+ 
+    For i = 0 To ubArr Step 2 ' Build unicode array
+        bArr(i) = Byte1
+        bArr(i + 1) = Byte2
+    Next i
+ 
+    AltString = bArr ' Convert unicode array to unicode string
+End Function

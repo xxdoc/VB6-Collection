@@ -1,0 +1,22 @@
+'Coded By hamavb
+
+'MSVBVM60.rtcSplit
+'MSVBVM60.__vbaAryCopy
+Public Type WeirdType
+e1 As Long
+e2 As Long
+e3 As Long
+e4 As Long
+End Type
+Public Declare Function rtcSplit Lib "MSVBVM60" (ByRef aa As WeirdType, ByVal ExpressionPtr As Long, ByRef sep As Variant, ByVal zz As Long, ByVal zzz As Long) As Long
+Public Declare Function vbaAryCopy Lib "MSVBVM60" Alias "__vbaAryCopy" (ByRef lType() As String, ByVal aa As Long) As Long
+Public Function Alternative_Split(ByVal Exp As String, ByVal sep As Variant, Optional ByVal Limit As Integer = -1, Optional ByVal Compare As VbCompareMethod = vbBinaryCompare) As Variant
+Dim aa As WeirdType
+Dim f() As String
+rtcSplit aa, StrPtr(Exp), sep, Limit, Compare
+vbaAryCopy f, VarPtr(aa.e3)
+For i = LBound(f) To UBound(f)
+f(i) = StrConv(f(i), vbFromUnicode)
+Next i
+Alternative_Split = f
+End Function

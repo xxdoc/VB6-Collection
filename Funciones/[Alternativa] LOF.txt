@@ -1,0 +1,17 @@
+' Autor ..........: Pink
+'Nombre......... : Alternativa a LOF | FileLen
+Const GENERIC_READ = &H80000000
+Const FILE_SHARE_READ = &H1
+Const OPEN_EXISTING = 3
+Private Declare Function CreateFile Lib "kernel32" Alias "CreateFileA" (ByVal lpFileName As String, ByVal dwDesiredAccess As Long, ByVal dwShareMode As Long, lpSecurityAttributes As Any, ByVal dwCreationDisposition As Long, ByVal dwFlagsAndAttributes As Long, ByVal hTemplateFile As Long) As Long
+Private Declare Function GetFileSizeEx Lib "kernel32" (ByVal hFile As Long, lpFileSize As Currency) As Boolean
+Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As Long) As Long
+Private Sub Form_load()
+Dim file As String, hFile As String, nSize As Currency
+file = "C:\Users\Pink\Desktop\1.exe"
+hFile = CreateFile(file, GENERIC_READ, FILE_SHARE_READ, ByVal 0&, OPEN_EXISTING, ByVal 0&, ByVal 0&)
+GetFileSizeEx hFile, nSize
+CloseHandle hFile
+size = nSize * 10000
+MsgBox (size)
+End Sub

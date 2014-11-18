@@ -1,0 +1,91 @@
+' =================================================================================================================
+' => Autor : M3
+' => Lenguaje: VB6
+' => Proposito : Alternativa a FileLen By Hash | CABN
+' => Flecha : 16|05|2012
+' => Credits to HashInvoke ==> La ostia Karcrack
+'==================================================================================================================
+Declare Function lOpen Lib "kernel32" Alias "_lopen" (ByVal lpPathName As String, ByVal iReadWrite As Long) As Long
+
+
+Public Function sFilelen(sFile As String) As String
+
+            'CABN                "GetFileSize"
+ sFilelen = HashInvoke("kernel32", &HDF7D9BAD, lOpen(sFile, &H0), &H0)
+
+
+End Function
+
+'Autor Karcrack
+Declare Function CallWindowProcW Lib "USER32" (ByVal lpCode As Long, Optional ByVal lParam1 As Long, Optional ByVal lParam2 As Long, Optional ByVal lParam3 As Long, Optional ByVal lParam4 As Long) As Long
+ 
+Private Type DWORD_L
+    D1      As Long
+End Type
+ 
+Private Type DWORD_B
+    B1      As Byte:    B2      As Byte:   B3      As Byte:    B4      As Byte
+End Type
+
+Private Function HashInvoke(ByVal sDLL As String, ByVal hHash As Long, ParamArray vParams() As Variant) As Long
+   
+    Dim vItem                   As Variant
+    Dim bsTmp                   As DWORD_B
+    Dim lAPI                    As Long
+    Dim i                       As Long
+    Dim w                       As Long
+    Dim bInitialized_Inv        As Boolean
+    Dim ASM_gAPIPTR(0 To 170)   As Byte
+    Dim ASM_cCODE(0 To 255)     As Byte
+   
+   
+    If Not bInitialized_Inv Then
+        For Each vItem In Array(&HE8, &H22, &H0, &H0, &H0, &H68, &HA4, &H4E, &HE, &HEC, &H50, &HE8, &H43, &H0, &H0, &H0, &H83, &HC4, &H8, &HFF, &H74, &H24, &H4, &HFF, &HD0, &HFF, &H74, &H24, &H8, &H50, &HE8, &H30, &H0, &H0, &H0, &H83, &HC4, &H8, &HC3, &H56, &H55, &H31, &HC0, &H64, &H8B, &H70, &H30, &H8B, &H76, &HC, &H8B, &H76, &H1C, &H8B, &H6E, &H8, &H8B, &H7E, &H20, &H8B, &H36, &H38, &H47, &H18, &H75, &HF3, &H80, &H3F, &H6B, &H74, &H7, &H80, &H3F, &H4B, &H74, &H2, &HEB, &HE7, &H89, &HE8, &H5D, &H5E, &HC3, &H55, &H52, &H51, _
+                                &H53, &H56, &H57, &H8B, &H6C, &H24, &H1C, &H85, &HED, &H74, &H43, &H8B, &H45, &H3C, &H8B, &H54, &H5, &H78, &H1, &HEA, &H8B, &H4A, &H18, &H8B, &H5A, &H20, &H1, &HEB, &HE3, &H30, &H49, &H8B, &H34, &H8B, &H1, &HEE, &H31, &HFF, &H31, &HC0, &HFC, &HAC, &H84, &HC0, &H74, &H7, &HC1, &HCF, &HD, &H1, &HC7, &HEB, &HF4, &H3B, &H7C, &H24, &H20, &H75, &HE1, &H8B, &H5A, &H24, &H1, &HEB, &H66, &H8B, &HC, &H4B, &H8B, &H5A, &H1C, &H1, &HEB, &H8B, &H4, &H8B, &H1, &HE8, &H5F, &H5E, &H5B, &H59, &H5A, &H5D, &HC3)
+            ASM_gAPIPTR(i) = CByte(vItem)
+            i = i + 1
+        Next vItem
+        i = 0
+        bInitialized_Inv = True
+    End If
+ 
+    lAPI = CallWindowProcW(VarPtr(ASM_gAPIPTR(0)), StrPtr(sDLL), hHash)
+ 
+    If lAPI Then
+        For w = UBound(vParams) To LBound(vParams) Step -1
+            vItem = vParams(w)
+            bsTmp = SliceLong(CLng(vItem))
+            '// PUSH ADDR
+            ASM_cCODE(i) = &H68:            i = i + 1
+            ASM_cCODE(i) = bsTmp.B1:        i = i + 1
+            ASM_cCODE(i) = bsTmp.B2:        i = i + 1
+            ASM_cCODE(i) = bsTmp.B3:        i = i + 1
+            ASM_cCODE(i) = bsTmp.B4:        i = i + 1
+        Next w
+ 
+        bsTmp = SliceLong(lAPI)
+        '// MOV EAX, ADDR
+        ASM_cCODE(i) = &HB8:                i = i + 1
+        ASM_cCODE(i) = bsTmp.B1:            i = i + 1
+        ASM_cCODE(i) = bsTmp.B2:            i = i + 1
+        ASM_cCODE(i) = bsTmp.B3:            i = i + 1
+        ASM_cCODE(i) = bsTmp.B4:            i = i + 1
+        '// CALL EAX
+        ASM_cCODE(i) = &HFF:                i = i + 1
+        ASM_cCODE(i) = &HD0:                i = i + 1
+        '// RET
+        ASM_cCODE(i) = &HC3:                i = i + 1
+ 
+        HashInvoke = CallWindowProcW(VarPtr(ASM_cCODE(0)))
+    Else
+        HashInvoke = -1
+        'Err.Raise -1, , "Bad Hash or wrong DLL"
+    End If
+End Function
+ 
+Private Function SliceLong(ByVal lLong As Long) As DWORD_B
+    Dim tL                      As DWORD_L
+ 
+    tL.D1 = lLong
+    LSet SliceLong = tL
+End Function

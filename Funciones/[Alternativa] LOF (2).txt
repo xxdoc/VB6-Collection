@@ -1,0 +1,11 @@
+' Autor ..........: Pink
+'Nombre......... : Alternativa a LOF | FileLen
+'Gracias JackNKush  Por la sugerencia
+
+Private Declare Function GetCompressedFileSizeA Lib "kernel32" (ByVal lpFileName As String, lpFileSizeHigh As Long) As Long
+Private Sub Form_Load()
+Dim Size As String, myfile As String
+myfile = "C:\Users\Pink\Desktop\1.exe"
+Size = CStr(GetCompressedFileSizeA(myfile, ByVal 0&))
+MsgBox (Size)
+End Sub

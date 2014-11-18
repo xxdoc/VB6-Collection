@@ -1,0 +1,9 @@
+Public Function AltLen(ByVal Temp As Variant) As Long
+    Dim bArr()  As Byte
+    Dim ubArr   As Long
+ 
+    bArr = Temp ' Convert Temp variable to array
+    ubArr = UBound(bArr) ' Highest possible number in array
+   
+    AltLen = (ubArr + 1) / 2 ' +1 for non-array, /2 for ansi
+End Function

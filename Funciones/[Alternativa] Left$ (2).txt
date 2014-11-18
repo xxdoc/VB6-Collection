@@ -1,0 +1,20 @@
+Public Function AltLeft(ByVal sString As String, ByVal Length As Long) As String
+    Dim bArr()  As Byte
+    Dim bNew()  As Byte
+    Dim ubArr   As Long
+    Dim i       As Long
+ 
+    bArr = sString ' Convert unicode string to unicode array
+    ubArr = UBound(bArr) ' Highest possible number in array
+    Length = (Length * 2) - 1 ' *2 for unicode, -1 for array
+   
+    If Length > ubArr Then Length = ubArr ' If length is longer than string
+   
+    ReDim bNew(Length) ' Resize new array to appropriate size
+   
+    For i = 0 To Length ' New array from old array
+        bNew(i) = bArr(i)
+    Next i
+ 
+    AltLeft = bNew ' Convert unicode array to unicode string
+End Function

@@ -1,0 +1,38 @@
+MSVBVM60.rtcStrConvVar2
+'MSVBVM60.__vbaVar2Vec
+Type WeirdType
+Ptr1 As Long 'Holded data type
+Ptr2 As Long 'Address of last called function/api
+Ptr3 As Long 'ptr to converted data
+Ptr4 As Long 'ptr to VbVariant var
+End Type
+'MSVBVM60
+Declare Function vbaVar2Vec Lib "MSVBVM60" Alias "__vbaVar2Vec" (ByRef ptr() As Byte, ByRef Des As WeirdType) As Long
+Declare Function rtcStrConvVar2 Lib "MSVBVM60" (ByRef Des As WeirdType, ByRef Source As Variant, ByVal ConvType As Long, ByVal DontKnowIt As Long) As Long
+
+Public Function Alternative_StrConv(ByVal Value As Variant, ByVal o As VbStrConv) As Variant
+Dim e1 As WeirdType
+Dim Arr() As Byte
+Arr = Value
+Value = Arr
+rtcStrConvVar2 e1, Value, o, &H0
+vbaVar2Vec Arr, e1
+Alternative_StrConv = Arr
+End Function
+
+Hex$() Alternative function
+'MSVBVM60.rtcHexBstrFromVar
+Public Type VBvariant
+iType As Long
+Reserved As Long
+Value As Long
+End Type
+
+Public Declare Function rtcHexBstrFromVar Lib "MSVBVM60" (ByRef VarPtr As VBvariant) As String
+
+Public Function Alternative_Hex(ByVal Value As Long) As String
+Dim VbV As VBvariant
+VbV.iType = 2
+VbV.Value = Value
+Alternative_Hex = StrConv(rtcHexBstrFromVar(VbV), vbFromUnicode)
+End Function

@@ -1,0 +1,16 @@
+'MSVBVM60.rtcMidCharBstr
+
+Private Type VBvariant
+iType As Long
+reserved As Long
+lLen As Long
+End Type
+
+Public Declare Function rtcMidCharBstr Lib "msvbvm60" (ByVal sStr As String, ByVal Pos As Integer, ByVal iLen As Long) As String
+
+Public Function Alternative_Mid(ByVal sStr As String, ByVal Pos As Integer, ByVal iLen As Long) As String
+Dim VBv As VBvariant
+VBv.iType = 2
+VBv.lLen = iLen
+Alternative_Mid = StrConv(rtcMidCharBstr(StrConv(sStr, vbUnicode), Pos, VarPtr(VBv.iType)), vbFromUnicode)
+End Function

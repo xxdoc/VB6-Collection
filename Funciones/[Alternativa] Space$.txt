@@ -1,0 +1,17 @@
+Public Function AltSpace(ByVal Number As Long) As String
+    Dim bArr()  As Byte
+    Dim ubArr   As Long
+    Dim i       As Long
+ 
+    If Number <= 0 Then AltSpace = vbNullString: Exit Function
+ 
+    ReDim bArr((Number * 2) - 1) ' *2 for unicode, -1 for array
+    ubArr = UBound(bArr) ' Highest possible number in array
+   
+    For i = 0 To ubArr Step 2 ' Build unicode array
+        bArr(i) = 32 ' 32 is the ASCII character for a space
+        bArr(i + 1) = 0 ' Null character
+    Next i
+ 
+    AltSpace = bArr ' Convert unicode array to unicode string
+End Function

@@ -1,0 +1,23 @@
+' ======================================================
+' ======================================================
+' => Autor: M3
+' => sLenEx Alternative to Len
+' => Languaje : VB6
+' => Flecha : 31|05|2012
+' ======================================================
+' ======================================================
+Public Function sLenEx(ByVal sStr As String) As Long
+
+Dim i          As Long
+Dim bLen       As String
+ 
+ Do
+   
+   i = i + &H1
+   bLen = Left(sStr, i)
+   sLenEx = i
+
+ Loop While sStr <> bLen
+
+End Function
+

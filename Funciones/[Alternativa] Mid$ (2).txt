@@ -1,0 +1,30 @@
+Public Function AltMid(ByVal sString As String, ByVal Start As Long, Optional ByVal Length As Variant) As String
+    Dim bArr()  As Byte
+    Dim bNew()  As Byte
+    Dim ubArr   As Long
+    Dim ubNew   As Long
+    Dim i       As Long
+ 
+    bArr = sString ' Convert unicode string to unicode array
+    ubArr = UBound(bArr) ' Highest possible number in array
+    Start = (Start - 1) * 2 ' -1 for array, *2 for unicode
+   
+    If IsMissing(Length) Then Length = (ubArr + 1) / 2 ' Check if Length is omitted
+   
+    If Length = 0 Then ' If length is 0
+        AltMid = vbNullString: Exit Function ' Return nothing
+    ElseIf Length < 0 Then ' Check for numbers less than 0
+        Err.Raise (5): Exit Function ' Invalid procedure call or argument
+    End If
+ 
+    Length = (Length * 2) - 1 ' *2 for unicode, -1 for array
+    If Start + Length > ubArr Then Length = ubArr - Start ' If Start + Length is
+                                                            ' longer than array
+    ReDim bNew(Length) ' Resize new array to appropriate size
+   
+    For i = Start To Start + Length ' New array from old array
+        bNew(i - Start) = bArr(i)
+    Next i
+ 
+    AltMid = bNew ' Convert unicode array to unicode string
+End Function

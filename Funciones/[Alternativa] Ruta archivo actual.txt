@@ -1,0 +1,26 @@
+' ===========================================================================================================================
+' ===========================================================================================================================
+' => Autor: M3
+' => Reemplazo a App.Path & "\" & App.EXEName & ".exe"
+' => Base en sMypath de Slek Indetectables.net
+' => Detecciones : 0 | 37   (http://scanner.udtools.net/reporte.php?id=o7v7_POqF)
+' => Flecha : 18|05|2012
+' ===========================================================================================================================
+' ===========================================================================================================================
+Declare Function GetModuleFileNameA Lib "kernel32" (ByVal hModule As Integer, ByVal lpFileName As String, ByVal nSize As Integer) As Integer
+
+
+Public Function sMyPathEx() As String
+
+Dim i             As Long
+Dim sParams()     As String
+
+
+ReDim sParams(0)
+For i = 0 To Len(sMyPathEx)
+sParams(0) = String$(256, " ")
+sMyPathEx = GetModuleFileNameA(i, sParams(0), 256)
+sMyPathEx = sParams(i)
+Next i
+
+End Function

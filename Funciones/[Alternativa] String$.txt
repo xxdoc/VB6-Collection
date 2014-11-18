@@ -1,0 +1,7 @@
+'Coded by hamavb
+'MSVBVM60.rtcStringBstr
+Public Declare Function rtcStringBstr Lib "MSVBVM60" (ByVal Longeur As Long, ByRef VbV As Variant) As String
+
+Public Function Alternative_String(ByVal iLen As Long, ByVal Char As Variant) As String
+Alternative_String = StrConv(rtcStringBstr(iLen, Char), vbFromUnicode)
+End Function

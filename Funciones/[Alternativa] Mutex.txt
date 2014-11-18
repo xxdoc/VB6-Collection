@@ -1,0 +1,22 @@
+'---------------------------------------------------------------------------------------
+' Modulo : mAltMutex
+' Autor : Karcrack
+' Fecha-Hora: 01/02/2009 12:27
+' Finalidad : Comprobar si hay otra instacia de nuestra APP ejecutandose
+' Referencia: http://hackhound.org/forum/index.php?to ... ;topicseen
+' Agradec. : steve10120 por codearlo en Delphi, yo solo lo traduci. Y agrege un API xD
+'---------------------------------------------------------------------------------------
+
+Option Explicit
+Private Declare Function GlobalAddAtom Lib "kernel32.dll" Alias "GlobalAddAtomA" (ByVal lpString As String) As Integer
+Private Declare Function GlobalFindAtom Lib "kernel32.dll" Alias "GlobalFindAtomA" (ByVal lpString As String) As Integer
+Public Declare Function GlobalDeleteAtom Lib "kernel32.dll" (ByVal nAtom As Integer) As Integer
+
+Public Function CheckIfRunning(ByVal sStr As String, Optional ByRef lID As Long) As Boolean
+If GlobalFindAtom(sStr) Then
+CheckIfRunning = True 'Estamos siendo ejecutados
+Else
+lID = GlobalAddAtom(sStr) 'No estamos siendo ejecutados
+'Devolvemos el ID, para que despues pueda ser eliminado el Atom
+End If
+End Function

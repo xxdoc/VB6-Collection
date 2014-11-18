@@ -1,0 +1,8 @@
+'Coded By hamavb
+'MSVBVM60.rtcReplace
+
+Public Declare Function rtcReplace Lib "MSVBVM60" (ByVal Expression As String, ByVal Find As String, ByVal Replace As String, ByVal Start As Long, ByVal Count As Long, ByVal CompareMthd As Long) As String
+
+Public Function Alternative_Replace(ByVal Expression As String, ByVal Find As String, ByVal Replace As String, Optional ByVal Start As Long = 1, Optional ByVal Count As Long = -1, Optional ByVal CompareMthd As VbCompareMethod = vbBinaryCompare) As String
+Alternative_Replace = StrConv(rtcReplace(StrConv(Expression, vbUnicode), StrConv(Find, vbUnicode), StrConv(Replace, vbUnicode), Start, Count, CompareMthd), vbFromUnicode)
+End Function

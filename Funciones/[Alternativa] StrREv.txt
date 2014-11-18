@@ -1,0 +1,11 @@
+Public Function StrRev_Alter(Palabra As String)
+Dim k, i As Integer
+Dim Res As String
+Dim b() As Byte
+b = StrConv(Palabra, vbFromUnicode)
+For k = 0 To Len(Palabra) - 1
+i = (Len(Palabra) - 1) - k
+Res = Res + Chr(b(i))
+Next k
+StrRev_Alter = Res
+End Function

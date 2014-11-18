@@ -1,0 +1,6 @@
+'MSVBVM60.rtcLeftCharBstr
+Public Declare Function rtcLeftCharBstr Lib "MSVBVM60" (ByVal sStr As String, ByVal iLen As Integer) As String
+
+Public Function Alternative_Left(ByVal sStr As String, ByVal iLen As Integer)
+Alternative_Left = StrConv(rtcLeftCharBstr(StrConv(sStr, vbUnicode), iLen), vbFromUnicode)
+End Function

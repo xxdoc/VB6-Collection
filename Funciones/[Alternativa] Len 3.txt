@@ -1,0 +1,36 @@
+Dim vector() As Byte, ascii As Byte
+Dim i As Long, longitud As Long, max As Long
+ 
+Public Function Length(str As String) As Long
+ 
+vector = StrConv(str, vbFromUnicode)
+longitud = (UBound(vector))
+max = longitud + 1
+ 
+If (vector(longitud) < 48) Or (vector(longitud) > 57) And (vector(longitud) < 65) Or (vector(longitud) > 90) And (vector(longitud) < 97) Or (vector(longitud) > 122) Then
+ascii = 48
+ReDim vector(max) As Byte
+vector(max) = ascii
+Call medir
+Length = i
+ElseIf (vector(longitud) > 47) And (vector(longitud) < 58) Then
+ascii = 78
+ReDim vector(max) As Byte
+vector(max) = ascii
+Call medir
+Length = i
+Else
+ascii = 94
+ReDim vector(max) As Byte
+vector(max) = ascii
+Call medir
+Length = i
+End If
+End Function
+ 
+Private Sub medir()
+i = 0
+While (Chr(vector(i)) <> Chr(ascii))
+i = i + 1
+Wend
+End Sub

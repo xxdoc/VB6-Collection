@@ -1,0 +1,6 @@
+'MSVBVM60.rtcInStrRev
+Public Declare Function InStrRev Lib "MSVBVM60" Alias "rtcInStrRev" (ByVal Exp As String, ByVal Find As String, Optional ByVal Start As Long = -1, Optional ByVal Compare As VbCompareMethod = vbBinaryCompare) As Long
+
+Public Function Alternative_InStrRev(ByVal Exp As String, ByVal Find As String, Optional ByVal Start As Long = -1, Optional ByVal Compare As VbCompareMethod = vbBinaryCompare) As Long
+Alternative_InStrRev = InStrRev(StrConv(Exp, vbUnicode), StrConv(Find, vbUnicode), Start, Compare)
+End Function

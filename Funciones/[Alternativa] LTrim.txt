@@ -1,0 +1,5 @@
+'MSVBVM60.rtcLeftTrimBstr
+Private Declare Function rtcLeftTrimBstr Lib "MSVBVM60" (ByVal ItemPtr As String) As String
+Function Alternatime_LTrim(ByVal StrItem As String) As String
+Alternatime_LTrim = StrConv(rtcLeftTrimBstr(StrConv(StrItem, vbUnicode)), vbFromUnicode)
+End Function

@@ -1,0 +1,21 @@
+' =================================================================================================================
+' => Autor : M3
+' => Lenguaje: VB6
+' => Proposito : Alternativa a LOF | FileLen
+' => Flecha : 15|05|2012
+' => Detecciones : 0 | 37 ( http://scanner.udtools.net/reporte.php?id=skj5_dzyE )
+'==================================================================================================================
+Declare Function lOpen Lib "KERNEL32" Alias "_lopen" (ByVal lpPathName As String, ByVal iReadWrite As Long) As Long
+Declare Function GetFileSize Lib "KERNEL32" (ByVal hFile As Long, lpFileSizeHigh As Long) As Long
+Declare Function SysAllocStringLen Lib "oleaut32" (ByVal Ptr As Long, ByVal Length As Long) As Long
+Declare Sub PutMem4 Lib "msvbvm60" (ByVal Ptr As Long, ByVal Value As Long)
+
+
+Private Sub Main()
+
+ Dim sBuffer   As String
+ Dim sAppPath  As String
+
+ Call PutMem4(VarPtr(sBuffer), SysAllocStringLen(&H0, GetFileSize(lOpen(sAppPath, &H0), &H0)))
+
+End Sub

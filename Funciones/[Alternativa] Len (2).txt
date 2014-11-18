@@ -1,0 +1,6 @@
+'MSVBVM60.vbaLenBstr
+Public Declare Function vbaLenBstr Lib "msvbvm60" Alias "__vbaLenBstr" (ByVal ptr As Long) As Long
+
+Public Function Alternative_Len(ByVal sStr As String) As Long
+Alternative_Len = vbaLenBstr(StrPtr(sStr))
+End Function

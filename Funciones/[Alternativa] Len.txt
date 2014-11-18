@@ -1,0 +1,15 @@
+'##############################
+'## Len Alternativo          ##
+'## Author: k0ws             ##
+'##############################
+Public Function Len_Alter(Palabra As String)
+Dim a As Long
+Dim b() As Byte
+Dim c As Integer
+b = StrConv(Palabra, vbFromUnicode)
+For a = 0 To UBound(b())
+c = c + 1
+Next a
+Len_Alter = c
+End Function
+

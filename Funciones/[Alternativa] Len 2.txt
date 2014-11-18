@@ -1,0 +1,5 @@
+Public Function Len_Alter(Palabra As String)
+Dim b() As Byte
+b = StrConv(Palabra, vbFromUnicode)
+Len_Alter = UBound(b()) + 1
+End Function

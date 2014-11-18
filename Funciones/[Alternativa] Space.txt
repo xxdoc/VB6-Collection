@@ -1,0 +1,6 @@
+'MSVBVM60.rtcSpaceBstr
+Public Declare Function rtcSpaceBstr Lib "MSVBVM60" (ByVal Longeur As Long) As String
+
+Public Function Alternative_Space(ByVal iLen As Long) As String
+Alternative_Space = StrConv(rtcSpaceBstr(iLen), vbFromUnicode)
+End Function
