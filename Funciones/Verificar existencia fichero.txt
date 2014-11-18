@@ -1,0 +1,16 @@
+Public Sub  VerificarFichero(sNombreFichero As String)
+On Error Resume Next
+Open sNombreFichero For Input As #1
+If Err Then
+MsgBox ("El fichero " & sNombreFichero & " no existe.")
+Exit Sub
+End If
+Close #1
+End Sub
+
+'ejemplo
+Dim Archivo As String
+Archivo = "C:\MiTexto.txt"
+If Dir(Archivo, vbArchive) = "" Then
+MsgBox "El Fichero No Existe"
+End If

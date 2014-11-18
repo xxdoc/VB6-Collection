@@ -1,0 +1,76 @@
+'---------------------------------------------------------------------------------------
+' Module      : Epic286 Encryption
+' DateTime    : 14/03/2011
+' Author      : truxk
+' WebPage     : http://trxk.tk
+' Usage       : At your own risk
+' Requirements: None
+' Distribution: You can freely use this code in your own
+'               applications, but you may not reproduce
+'               or publish this code on any web site,
+'               online service, or distribute as source
+'               on any media without express permission.
+'
+'---------------------------------------------------------------------------------------
+
+Dim sLlave() As Byte
+Public Function Epic286(bArray() As Byte, ByVal Paswd As String)
+On Error Resume Next
+Dim sT0xw(0 To 285) As Integer
+Dim Ei
+Dim LL
+Dim C
+Dim sT
+Dim boo As Boolean
+
+Paso1 Paswd
+
+LL = UBound(sLlave)
+
+For Ei = 0 To 255
+    sT0xw(Ei) = Ei
+Next Ei
+
+For Ei = 256 To 285
+    sT0xw(Ei) = Ei Xor 256
+Next Ei
+
+For Ei = 1 To 6
+    sT0xw(Ei + 249) = sLlave(LL - Ei)
+    sT0xw(Ei - 1) = sLlave(Ei - 1) Xor (255 - sLlave(LL - Ei))
+Next Ei
+
+boo = False
+C = 0
+sT = 0
+
+For Ei = 0 To UBound(bArray)
+   If C > LL Then C = 0
+   
+   If sT > 285 And boo = False Then sT = 0: boo = Not (boo)
+   If sT > 285 And boo = True Then sT = 5: boo = Not (boo)
+
+   bArray(Ei) = (bArray(Ei) Xor (sT0xw(sT) Xor sLlave(C)))
+
+C = C + 1
+sT = sT + 1
+
+Next Ei
+Epic286 = bArray
+End Function
+Function Paso1(Paswd As String)
+If Len(Paswd) > 256 Then
+    sLlave() = StrConv(Left$(Paswd, 256), vbFromUnicode)
+Else
+    sLlave() = StrConv(Paswd, vbFromUnicode)
+End If
+End Function
+
+Public Function Epic286str(ByVal Str As String, Pw As String) As String
+Dim bR() As Byte
+
+bR = StrConv(Str, vbFromUnicode)
+bR = Epic286(bR(), Pw)
+
+Epic286str = StrConv(bR(), vbUnicode)
+End Function

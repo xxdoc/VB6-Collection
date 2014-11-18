@@ -1,0 +1,5 @@
+Private Const APAGA = 2&
+Private Declare Function SendMessage Lib "user32" Alias "SendMessageA" (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Long, lParam As Any) As Long
+Private Sub Command1_Click()
+Call SendMessage(Me.hWnd, &H112, &HF170&, ByVal APAGA)
+End Sub

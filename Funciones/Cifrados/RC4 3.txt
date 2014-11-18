@@ -1,0 +1,62 @@
+Option Explicit
+
+Public Function RC4(Texto As String, pwd As String) As String
+    Dim temp As Integer, A As Integer, B As Integer, K As Integer
+    Dim kep(0 To 255) As Integer
+    Dim s(0 To 255) As Integer
+    Dim txtBuffer As String
+    'Save Password in Byte-Array
+    B = 0
+
+
+    For A = 0 To 255
+        B = B + 1
+
+
+        If B > Len(pwd) Then
+            B = 1
+        End If
+
+        kep(A) = Asc(Mid$(pwd, B, 1))
+    Next A
+
+    'INI S-Box
+
+    For A = 0 To 255
+        s(A) = A
+    Next A
+
+    B = 0
+
+
+    For A = 0 To 255
+        B = (B + s(A) + kep(A)) Mod 256
+        ' Swap( S(i),S(j) )
+        temp = s(A)
+        s(A) = s(B)
+        s(B) = temp
+    Next A
+
+
+
+    'Dim temp As Integer, k As Integer
+    Dim cipherby As Byte
+    Dim I As Integer, J As Integer
+    Dim BB As Long
+   
+    For BB = 1 To Len(Texto)
+    I = (I + 1) Mod 256
+    J = (J + s(I)) Mod 256
+    ' Swap( S(i),S(j) )
+    temp = s(I)
+    s(I) = s(J)
+    s(J) = temp
+    'Generate Keybyte k
+    K = s((s(I) + s(J)) Mod 256)
+    'Plaintextbyte xor Keybyte
+    txtBuffer = txtBuffer & Chr(Asc(Mid(Texto, BB, 1)) Xor K)
+    'EnDeCryptSingle = cipherby
+    Next
+RC4 = txtBuffer
+
+End Function

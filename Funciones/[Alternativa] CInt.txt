@@ -1,0 +1,8 @@
+'MSVBVM60.__vbaI2Str
+Declare Function vbaI2Str Lib "msvbvm60" Alias "__vbaI2Str" (ByVal sStr As String) As Long
+
+Public Function Alternative_CInt(ByVal Expression As Variant) As Long
+Dim Exp As String
+Exp = Expression
+Alternative_CInt = vbaI2Str(StrConv(Exp, vbUnicode))
+End Function

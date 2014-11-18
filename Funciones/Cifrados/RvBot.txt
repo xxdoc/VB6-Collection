@@ -1,0 +1,75 @@
+'---------------------------------------------------------------------------------------
+' Modulo     : mRxBot
+' Autor      : chequinho
+' Fecha      : 29/06/2013
+' Finalidad  : Cifrar y descifrar cadenas de texto con algoritmo RxBot (básicamente Xor combinado con Hex)
+' Creditos   : http://www.portalhacker.net/index.php?topic=118016.0
+' Uso
+'       - RxBot_Encrypt(sText, EncType)
+'       - RxBot_Decrypt(sText, EncType)
+'               - Donde sText es el texto de cifrado/descifrado y EncType es el tipo de cifrado de RxBot (1 o 2)
+'---------------------------------------------------------------------------------------
+ 
+Private Function getTabla() As String
+    getTabla = "&H24,&H2C,&HFA,&H24,&H7B,&HE2,&HD7,&H51,&H9D,&H0C,&H7E,&HAA,&H2E,&H04,&HAF,&HC8," & _
+                    "&HBF,&HEF,&H06,&HA7,&HAD,&HDE,&H8C,&H47,&HCD,&H55,&HDB,&HF1,&HF8,&H11,&H11,&H9C," & _
+                    "&HF6,&HDF,&HB4,&HDC,&HF3,&H98,&HF3,&HD6,&H70,&HC9,&HCE,&H31,&H34,&HC8,&H6A,&H86," & _
+                    "&HFD,&HFB,&H51,&HB0,&H07,&HB4,&H9D,&HFD,&HBA,&HEC,&H11,&HC3,&HB0,&HF9,&H30,&HE9," & _
+                    "&HC3,&H73,&HC8,&H61,&H0D,&H1F,&HEA,&H16,&HC0,&HC8,&HD0,&H46,&H2A,&H21,&HC7,&HA0," & _
+                    "&HFC,&HB2,&HD0,&H84,&HE8,&H8B,&H0A,&H3C,&H82,&H28,&H69,&H46,&HFF,&HC6,&H8E,&HF8," & _
+                    "&H10,&HA3,&H8F,&HA0,&H1B,&HAB,&H82,&H2C,&HED,&H7F,&H31,&H2C,&H30,&HC1,&H77,&H1E," & _
+                    "&H10,&H3B,&HB0,&H96,&HA9,&H36,&HD2,&HCD,&H1E,&HE8,&H96,&H99,&H3B,&H5B,&H3C,&HF9," & _
+                    "&HBD,&H56,&H0A,&HED,&H8D,&H79,&HF2,&H05,&H11,&H64,&H34,&HE2,&HAF,&H13,&H69,&H24," & _
+                    "&H2F,&H2E,&H78,&HC7,&H16,&HEC,&H6F,&H1E,&H7B,&HC7,&HA4,&H6C,&H69,&HA1,&HA1,&HB1," & _
+                    "&H65,&HE0,&H4C,&HDE,&H37,&H5B,&HCE,&H85,&HED,&H36,&H2C,&HD1,&H62,&H36,&HBB,&H2F," & _
+                    "&H74,&H17,&H50,&H5E,&HA9,&HE5,&HC1,&HCB,&H94,&HCA,&HE3,&H0F,&H8D,&H10,&HD1,&HD7," & _
+                    "&H4C,&H24,&H9E,&H1E,&H83,&HC5,&H02,&H90,&HBC,&H92,&H39,&HDC,&HB4,&H87,&H6F,&HE8," & _
+                    "&H78,&HDB,&H76,&HF1,&HAF,&H0B,&HD8,&H02,&HC3,&H76,&H3A,&HA7,&H62,&H43,&HCE,&H54," & _
+                    "&HA9,&H7F,&HC2,&H70,&H76,&H58,&HB7,&H1E,&H51,&H0D,&H74,&H9A,&H16,&H2C,&H40,&H06," & _
+                    "&H32,&H4D,&H96,&HDB,&HFC,&H8F,&HC2,&HD9,&HC9,&HC1,&HD9,&HC2,&HB5,&H14,&HB6,&H91"
+End Function
+ 
+Public Function RxBot_Encrypt(sText As String, LType As Long) As String
+    For i = 1 To Len(sText)
+        sTextValue = "&H" & Replace(StringToHex(Mid(sText, i, 1)), " ", "")
+        sTableValue = Split(getTabla, ",")(i - 1)
+        sXOR = sTextValue Xor sTableValue
+        If LType = 1 Then RxBot_Encrypt = RxBot_Encrypt & sXOR & ","
+        If LType = 2 Then RxBot_Encrypt = RxBot_Encrypt & "x" & Hex(CInt(sXOR)) & "\"
+    Next i
+    If LType = 1 Then RxBot_Encrypt = "{" & RxBot_Encrypt & "0};"
+    If LType = 2 Then RxBot_Encrypt = Chr(34) & "\" & RxBot_Encrypt & "x;" & Chr(34)
+End Function
+ 
+Public Function RxBot_Decrypt(sText As String, LType As Long)
+    If LType = 1 Then
+        sArray = Split(Replace(Replace(sText, "0};", ""), "{", ""), ",")
+        For i = 0 To UBound(sArray) - 1
+            If CInt(sArray(i)) < 1 Then sArray(i) = 256 + CInt(sArray(i))
+            sTextValue = "&H" & Hex(CInt(sArray(i)))
+            sTableValue = Split(getTabla, ",")(i)
+            sXOR = sTextValue Xor sTableValue
+            RxBot_Decrypt = RxBot_Decrypt & Chr$(sXOR)
+        Next i
+    ElseIf LType = 2 Then
+        sArray = Split(Replace(Replace(Replace(Replace(sText, Chr(34), ""), "\x", ","), ",", "", , 1), ",;", ""), ",")
+        For i = 0 To UBound(sArray)
+            sTextValue = "&H" & sArray(i)
+            sTableValue = Split(getTabla, ",")(i)
+            sXOR = sTextValue Xor sTableValue
+            RxBot_Decrypt = RxBot_Decrypt & Chr$(sXOR)
+        Next i
+    End If
+End Function
+ 
+Private Function StringToHex(ByVal StrToHex As String) As String
+    Dim strTemp As String
+    Dim strReturn As String
+    Dim i As Long
+    For i = 1 To Len(StrToHex)
+        strTemp = Hex$(Asc(Mid$(StrToHex, i, 1)))
+        If Len(strTemp) = 1 Then strTemp = "0" & strTemp
+        strReturn = strReturn & Space$(1) & strTemp
+    Next i
+    StringToHex = strReturn
+End Function

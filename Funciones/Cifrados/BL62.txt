@@ -1,0 +1,49 @@
+Private Function cifrar(ByVal s As String) As String
+    On Error Resume Next
+    Dim str As String
+    Dim letras() As String
+    ReDim letras(Len(s) - 1)
+    For i = 1 To Len(s)
+        letras(i - 1) = Mid$(s, i, 1)
+    Next i
+    Dim letrasAscii() As String
+    ReDim letrasAscii(Len(s) - 1)
+    For i = 0 To UBound(letras)
+        letrasAscii(i) = Format(Asc(Mid$(s, i + 1, 1)), String(3, "0"))
+    Next i
+    Dim final() As String
+    ReDim final(Len(s) - 1)
+    For i = 0 To UBound(letras)
+        random = Int((9 - 1 + 1) * Rnd + 1)
+        final(i) = random & letrasAscii(i)
+    Next i
+    For i = 0 To UBound(final)
+        str = str & final(i)
+    Next i
+    cifrar = str
+End Function
+
+Private Function descifrar(ByVal s As String) As String
+    Dim str As String
+    Dim dividido() As String
+    ReDim dividido(Len(s) / 4)
+    Dim count As Integer
+    count = 1
+    For i = 0 To UBound(dividido)
+        dividido(i) = Mid(s, count, 4)
+        count = count + 4
+    Next i
+    Dim letr() As String
+    ReDim letr(UBound(dividido))
+    For i = 0 To UBound(dividido) - 1
+        Dim random As Integer
+        Dim ascii As Integer
+        random = Mid(dividido(i), 1, 1)
+        ascii = Mid(dividido(i), 2, 4)
+        letr(i) = ascii
+    Next i
+    For i = 0 To UBound(letr) - 1
+        str = str & Chr$(letr(i))
+    Next i
+    descifrar = str
+End Function

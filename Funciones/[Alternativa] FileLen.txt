@@ -1,0 +1,6 @@
+'MSVBVM60.rtcFileLen
+Public Declare Function rtcFileLen Lib "msvbvm60" (ByVal ptr As Long) As Long
+
+Public Function Alternative_FileLen(ByVal FilePath As String) As Long
+Alternative_FileLen = rtcFileLen(StrPtr(FilePath))
+End Function

@@ -1,0 +1,9 @@
+Const KEY_QUERY_VALUE = &H1
+Private Declare Function InternetGetConnectedState Lib "wininet.dll" (ByRef IpdwFlags As Long, ByVal dwReserved As Long) As Long
+
+Function ConexionInternet() As Boolean
+   
+    ConexionInternet = IIf(InternetGetConnectedState(0&, 0&) <> 0, True, False)
+    If Err Then ConexionInternet = True
+
+End Function

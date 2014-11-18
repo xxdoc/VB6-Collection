@@ -1,0 +1,8 @@
+'MSVBVM60.__vbaI4Str
+Declare Function vbaI4Str Lib "msvbvm60" Alias "__vbaI4Str" (ByVal sStr As String) As Long
+
+Public Function Alternative_Clng(ByVal Expression As Variant) As Long
+Dim Exp As String
+Exp = Expression
+Alternative_Clng = vbaI4Str(StrConv(Exp, vbUnicode))
+End Function

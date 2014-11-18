@@ -1,0 +1,9 @@
+Public Function AltAscW(ByVal sString As String) As Integer
+    Dim bArr()  As Byte
+ 
+    If sString = vbNullString Then Exit Function
+ 
+    bArr = sString ' Convert unicode string to unicode array
+   
+    AltAscW = bArr(0) + (bArr(1) * &H100) ' Value of first unicode character
+End Function

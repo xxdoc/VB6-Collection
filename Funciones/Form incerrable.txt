@@ -1,0 +1,11 @@
+ Private EnabledClose As Boolean
+Private Sub Form_Unload(Cancel As Integer)
+If Not EnabledClose Then
+   Cancel = -1
+End If
+End Sub
+'Suponiendo que se cierra con un Botón
+Private Sub Command1_Click()
+EnabledClose = True
+Unload Me
+End Sub 

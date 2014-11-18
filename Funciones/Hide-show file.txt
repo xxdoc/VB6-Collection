@@ -1,0 +1,51 @@
+Public Function HideFile(ByVal FilePath As String) As Boolean
+
+On Error GoTo mal
+
+If Dir(FilePath) <> "" Then
+
+SetAttr FilePath, 2
+
+Else
+
+GoTo mal
+
+End If
+
+HideFile = True
+
+Exit Function
+
+mal:
+
+HideFile = False
+
+End Function
+
+
+Public Function sShowFile(ByVal FilePath As String) As Boolean
+
+On Error GoTo mal
+
+
+If Dir(FilePath) <> "" Then
+
+SetAttr FilePath, 0
+
+Else
+
+GoTo mal
+
+End If
+
+sShowFile = True
+
+Exit Function
+
+
+
+mal:
+
+sShowFile = False
+
+End Function

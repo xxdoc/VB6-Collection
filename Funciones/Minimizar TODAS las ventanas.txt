@@ -1,0 +1,9 @@
+Declare Sub keybd_event Lib "user32" (ByVal bVk As Byte, ByVal bScan As Byte, _
+ ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
+ 
+ Public Const VK_LWIN = &H5B
+ Public Const KEYEVENTF_KEYUP = &H2
+ 
+  Call keybd_event(VK_LWIN, 0, 0, 0)
+   Call keybd_event(&H4D, 0, 0, 0)
+   Call keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, 0)

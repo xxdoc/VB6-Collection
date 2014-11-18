@@ -1,0 +1,14 @@
+'Capturar la pantalla entera o la ventana activa:
+
+'Añada dos botones y escriba el siguiente código
+Private Declare Sub keybd_event Lib "user32" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
+
+Private Sub Command1_Click()
+'Captura la ventana activa
+keybd_event 44, 0, 0&, 0&
+End Sub
+
+Private Sub Command2_Click()
+'Captura toda la pantalla
+keybd_event 44, 1, 0&, 0&
+End Sub

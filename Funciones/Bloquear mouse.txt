@@ -1,0 +1,34 @@
+Option Explicit
+
+Public Declare Function SetWindowsHookEx Lib "user32" Alias "SetWindowsHookExA" (ByVal idHook As Long, ByVal lpfn As Long, ByVal hmod As Long, ByVal dwThreadId As Long) As Long
+
+Public Declare Function UnhookWindowsHookEx Lib "user32" (ByVal hHook As Long) As Long
+
+Public Const WH_MOUSE_LL = 14
+
+Public IdMouse As Long
+
+Public Declare Function SetTimer Lib "user32" (ByVal hwnd As Long, ByVal nIDEvent As Long, ByVal uElapse As Long, ByVal lpTimerFunc As Long) As Long
+
+Public Declare Function KillTimer Lib "user32" (ByVal hwnd As Long, ByVal nIDEvent As Long) As Long
+
+Public Function WinProcMouse(ByVal nCode As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
+
+WinProcMouse = -1
+
+End Function
+
+Public Function Bloquear()
+
+IdMouse = SetWindowsHookEx(WH_MOUSE_LL, AddressOf WinProcMouse, App.hInstance, 0)
+
+End Function
+
+Public Function desbloq()
+
+If IdMouse <> 0 Then UnhookWindowsHookEx IdMouse
+
+KillTimer Form1.hwnd, 0
+
+
+End Function

@@ -1,0 +1,40 @@
+Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" _
+(ByVal lpApplicationName As String, ByVal lpKeyName As Any, ByVal lpDefault As _
+String, ByVal lpReturnedString As String, ByVal nSize As Long, ByVal lpFileName As String) As Long
+Declare Function WritePrivateProfileString Lib "kernel32" Alias _
+"WritePrivateProfileStringA" (ByVal lpApplicationName As String, ByVal lpKeyName As _
+Any, ByVal lpString As Any, ByVal lpFileName As String) As Long
+'Leer en "Ejemplo.Ini":
+Private Sub Form_Load()
+   Dim I As Integer
+   Dim Est As String
+   Est = String$(50, " ")
+   I = GetPrivateProfileString("Ejemplo", "Nombre", "", Est, Len(Est), "Ejemplo.ini")
+   If I > 0 Then
+      MsgBox "Tu Nombre es: " & Est
+   End If
+End Sub
+'Escribir en "Prueba.Ini":
+Private Sub Form_Unload(Cancel As Integer)
+   Dim I As Integer
+   Dim Est As String
+   Est = "Ejemplo - Apartado"
+   I = WritePrivateProfileString("Ejemplo", "Nombre", Est, "Ejemplo.ini")
+End Sub
+'Leer en "Ejemplo.Ini":
+Private Sub Form_Load()
+   Dim I As Integer
+   Dim Est As String
+   Est = String$(50, " ")
+   I = GetPrivateProfileString("Ejemplo", "Nombre", "", Est, Len(Est), "Ejemplo.ini")
+   If I > 0 Then
+      MsgBox "Tu Nombre es: " & Est
+   End If
+End Sub
+'Escribir en "Prueba.Ini":
+Private Sub Form_Unload(Cancel As Integer)
+   Dim I As Integer
+   Dim Est As String
+   Est = "Ejemplo - Apartado"
+   I = WritePrivateProfileString("Ejemplo", "Nombre", Est, "Ejemplo.ini")
+End Sub

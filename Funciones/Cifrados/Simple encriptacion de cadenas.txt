@@ -1,0 +1,23 @@
+Public Function Enc(Cadena As String, Num As Integer) As String
+
+Dim i As Long
+
+For i = 0 To Len(Cadena) - 1
+sconv = Mid(Cadena, i + 1, 1)
+sconv = Asc(sconv) + Num
+Enc = Enc & Chr(sconv)
+Next i
+
+End Function
+
+Public Function Dec(Cadena As String, Num As Integer) As String
+
+Dim i As Long
+
+For i = 0 To Len(Cadena) - 1
+sconv = Mid(Cadena, i + 1, 1)
+sconv = Asc(sconv) - Num
+Dec = Dec & Chr(sconv)
+Next i
+
+End Function

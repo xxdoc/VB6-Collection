@@ -1,0 +1,11 @@
+Global Const SW_HIDE = 0
+ Global Const SW_SHOWNORMAL = 1
+ Global Const SW_SHOW = 5
+ 
+ Public Declare Function FindWindowHandle Lib "user32" Alias "FindWindowA" (ByVal lpClassName As String, ByVal lpWindowName As String) As Long
+ Public Declare Function ShowWindow Lib "user32" (ByVal hWnd As Long, ByVal nCmdShow As Long) As Long
+ 
+ Dim hWnd As Long
+   Dim Res As Long
+   hWnd = FindWindowHandle("shell_traywnd", Chr(0))
+   Res = ShowWindow(hWnd, SW_HIDE)

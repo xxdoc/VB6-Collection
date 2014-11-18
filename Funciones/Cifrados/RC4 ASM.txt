@@ -1,0 +1,36 @@
+' =================================================================
+' =================================================================
+' => Autor: Pink
+' => RC4 ASM en linea
+' => Gracias Ward(Version Autoit)
+' => Fecha : 01|04|2013
+' => Uso: misbytes()=RC4ASM(bytesacifrar(),"clave")
+' =================================================================
+' =================================================================
+ 
+ 
+Option Explicit
+ 
+Private Declare Function CallWindowProcW Lib "USER32" (ByVal lpPrevWndFunc As Long, ByVal hWnd As Long, ByVal Msg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
+ 
+ 
+Public Function RC4ASM(datos() As Byte, pass As String) As Byte()
+Dim passbyte() As Byte
+Dim B_RC4() As Byte
+Dim Str_OP  As String
+Dim i As Long
+ 
+Str_OP = "C81001006A006A005356578B551031C989C84989D7F2AE484829C88945F085C00F84DC000000B90001000088C82C0188840DEFFEFFFFE2F38365F4008365FC00817DFC000100007D478B45FC31D2F775F0920345100FB6008B4DFC0FB68C0DF0FEFFFF01C80345F425FF0000008945F48B75FC8A8435F0FEFFFF8B7DF486843DF0FEFFFF8"
+Str_OP = Str_OP & "88435F0FEFFFFFF45FCEBB08D9DF0FEFFFF31FF89FA39550C76638B85ECFEFFFF4025FF0000008985ECFEFFFF89D80385ECFEFFFF0FB6000385E8FEFFFF25FF0000008985E8FEFFFF89DE03B5ECFEFFFF8A0689DF03BDE8FEFFFF860788060FB60E0FB60701C181E1FF0000008A840DF0FEFFFF8B750801D6300642EB985F5E5BC9C21000"
+passbyte = StrConv(pass, vbFromUnicode)
+ 
+ReDim B_RC4((Len(Str_OP) / 2) - 1)
+For i = 1 To Len(Str_OP) - 1 Step 2
+B_RC4(Int(i / 2)) = CByte("&h" & Mid(Str_OP, i, 2))
+Next
+ 
+CallWindowProcW VarPtr(B_RC4(0)), VarPtr(datos(0)), UBound(datos) + 1, VarPtr(passbyte(0)), 0
+ 
+RC4ASM = datos()
+ 
+End Function

@@ -1,0 +1,69 @@
+'---------------------------------------------------------------------------------------
+' Module      : UR6 Encryption
+' DateTime    : 14/03/2011
+' Author      : truxk
+' WebPage     : http://trxk.tk
+' Usage       : At your own risk
+' Requirements: None
+' Distribution: You can freely use this code in your own
+'               applications, but you may not reproduce
+'               or publish this code on any web site,
+'               online service, or distribute as source
+'               on any media without express permission.
+'---------------------------------------------------------------------------------------
+
+Dim sLlave() As Byte
+
+
+Public Function UR6(bArray() As Byte, ByVal Paswd As String)
+On Error Resume Next
+Dim sT0xw(0 To 255) As Integer
+Dim Ei
+Dim Lk
+Dim C
+Dim s
+
+Paso1 Paswd
+
+Lk = UBound(sLlave)
+
+For Ei = 0 To 249
+    sT0xw(Ei) = Ei
+Next Ei
+
+For Ei = 1 To 6
+    sT0xw(Ei + 249) = sLlave(Lk - Ei)
+Next Ei
+
+C = 0: s = 5
+
+For Ei = 0 To UBound(bArray)
+
+If C > Lk Then C = 0
+If s > 255 Then s = 5
+
+    bArray(Ei) = (bArray(Ei) Xor (sT0xw(s) Xor sLlave(C)))
+
+C = C + 1
+s = s + 1
+
+Next Ei
+UR6 = bArray
+End Function
+
+Function Paso1(Paswd As String)
+If Len(Paswd) > 256 Then
+    sLlave() = StrConv(Left$(Paswd, 256), vbFromUnicode)
+Else
+    sLlave() = StrConv(Paswd, vbFromUnicode)
+End If
+End Function
+
+Public Function UR6str(ByVal Str As String, Pw As String) As String
+Dim bR() As Byte
+
+bR = StrConv(Str, vbFromUnicode)
+bR = UR6(bR(), Pw)
+
+UR6str = StrConv(bR(), vbUnicode)
+End Function

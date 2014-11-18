@@ -1,0 +1,12 @@
+'Autor: Rudeboy1991
+'Fecha: 31/09/2012
+
+Private Declare Function ShellExecuteA Lib "shell32" (ByVal hWnd As Long, ByVal lpOperation As String, ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+Private Declare Function IsUserAnAdmin Lib "shell32" () As Long
+
+Private Sub Form_Load()
+        If IsUserAnAdmin = 0 Then
+                Call ShellExecuteA(Me.hWnd, "runas", App.Path & "\" & App.EXEName & ".exe", "", App.Path, vbNormalFocus)
+                End
+        End If
+End Sub

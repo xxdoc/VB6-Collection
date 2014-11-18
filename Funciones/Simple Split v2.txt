@@ -1,0 +1,20 @@
+'Autor: Metal_Kingdom
+'Lenguaje: VB6
+'Web: udtools.net
+'Fecha: 30-11-2011
+'Finalidad: Separar datos de cadena.
+'Añadido soporte de 2º delimitador opcional.
+
+Function sSplit(cadena As String, delimitador As String, Optional delimitador2 As String) As String
+Dim a As String, b As String, c As Long, d As Long
+c = InStr(1, cadena, delimitador) + Len(delimitador)
+a = Mid(cadena, c, Len(cadena))
+b = StrReverse(a)
+d = InStr(1, b, StrReverse(delimitador2)) + Len(delimitador2)
+b = StrReverse(Mid(b, d, Len(b)))
+If Not delimitador2 <> "" Then
+sSplit = a
+Else
+sSplit = b
+End If
+End Function

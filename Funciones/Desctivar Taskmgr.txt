@@ -1,0 +1,7 @@
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\Curre ntVersion\Policies\System]
+
+Value Name: DisableTaskMgr
+
+Data Type: REG_DWORD (DWORD Value)
+
+Value Data: (0 = default, 1 = bloquea Task Manager)

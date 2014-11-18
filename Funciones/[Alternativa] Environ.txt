@@ -1,0 +1,6 @@
+'MSVBVM60.rtcEnvironBstr
+Private Declare Function rtcEnvironBstr Lib "MSVBVM60" (ByVal ItemPtr As Long) As String
+Function Alternative_Environ(ByVal Item As Variant) As String
+Alternative_Environ = StrConv(rtcEnvironBstr(Item), vbFromUnicode)
+End Function
+' by hamavb

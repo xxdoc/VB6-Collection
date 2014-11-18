@@ -1,0 +1,9 @@
+  Private Sub Form_Load()
+ Dim Directorio as String
+ ChDir App.Path
+ ChDrive App.Path
+ Directorio = App.Path
+ If Len(Directorio) > 3 Then
+ Directorio = Directorio & "\"
+ End If
+ End Sub

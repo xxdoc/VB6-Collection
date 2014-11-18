@@ -1,0 +1,53 @@
+Private Type OSVERSIONINFO
+    dwOSVersionInfoSize As Long
+    dwMajorVersion As Long
+    dwMinorVersion As Long
+    dwBuildNumber As Long
+    dwPlatformId As Long
+    szCSDVersion As String * 128
+End Type
+Private Declare Function GetVersionEx Lib "kernel32" Alias "GetVersionExA" (lpVersionInformation As OSVERSIONINFO) As Long
+Private Declare Sub keybd_event Lib "user32" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
+Private Declare Function GetKeyboardState Lib "user32" (pbKeyState As Byte) As Long
+Private Declare Function SetKeyboardState Lib "user32" (lppbKeyState As Byte) As Long
+Const VK_NUMLOCK = &H90
+Const VK_SCROLL = &H91
+Const VK_CAPITAL = &H14
+Const KEYEVENTF_EXTENDEDKEY = &H1
+Const KEYEVENTF_KEYUP = &H2
+Const VER_PLATFORM_WIN32_NT = 2
+Const VER_PLATFORM_WIN32_WINDOWS = 1
+Dim o As OSVERSIONINFO
+Dim NumLockState As Boolean
+Dim ScrollLockState As Boolean
+Dim CapsLockState As Boolean
+
+'Aca podemos modificar el estado
+Private Sub Num_Lock_Click()
+o.dwOSVersionInfoSize = Len(o)
+GetVersionEx o
+Dim keys(0 To 255) As Byte
+GetKeyboardState keys(0)
+NumLockState = keys(VK_NUMLOCK)
+If NumLockState <> True Then
+    'Poner numlock a on
+    If o.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS Then
+        'Si es Win95
+        keys(VK_NUMLOCK) = 1
+        SetKeyboardState keys(0)
+    ElseIf o.dwPlatformId = VER_PLATFORM_WIN32_NT Then
+        'Si es WinNT
+        keybd_event VK_NUMLOCK, &H45, KEYEVENTF_EXTENDEDKEY Or 0, 0
+        keybd_event VK_NUMLOCK, &H45, KEYEVENTF_EXTENDEDKEY Or KEYEVENTF_KEYUP, 0
+    End If
+ Else
+'Poner Num_Lock a Off
+If o.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS Then
+        keys(VK_NUMLOCK) = 0
+        SetKeyboardState keys(0)
+        ElseIf o.dwPlatformId = VER_PLATFORM_WIN32_NT Then
+        keybd_event VK_NUMLOCK, &H45, KEYEVENTF_EXTENDEDKEY Or 0, 0
+         keybd_event VK_NUMLOCK, &H45, KEYEVENTF_EXTENDEDKEY Or KEYEVENTF_KEYUP, 0
+    End If
+End If
+End Sub

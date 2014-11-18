@@ -1,0 +1,8 @@
+Private Declare Function GetKeyState Lib "user32" (ByVal nVirtKey As Long) As Integer
+Private Sub Timer1_Timer()
+If GetKeyState(32) < 0 And GetKeyState(vbKeyUp) < 0 Then
+Label1.Caption = "Estás pulsando espacio y arriba a la vez."
+Else
+Label1.Caption = "No"
+End If
+End Sub

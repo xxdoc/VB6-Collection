@@ -1,0 +1,28 @@
+'uso
+'dim cadena as string
+'cadena=GetEOF("C:\Documents and Settings\Dark\Escritorio\1.exe")
+ 
+Function GetEOF(FilePath As String) As String
+Dim pPEHeader As Long
+Dim RawSize As Long
+Dim RawOffset As Long
+Dim NS As Integer
+Dim FUS As Long
+Dim PET As Long
+Dim RT As Long
+Dim EOFmas As String
+Dim Fin As Long
+Open FilePath For Binary As #1
+Get #1, 61, pPEHeader
+Get #1, pPEHeader + 7, NS
+FUS = pPEHeader + 248 + ((NS - 1) * 40)
+Get #1, FUS + 17, RawSize
+Get #1, FUS + 21, RawOffset
+PET = RawSize + RawOffset
+RT = FileLen(FilePath)
+Fin = RT - PET
+EOFmas = Space(Fin)
+Get #1, PET + 1, EOFmas
+Close #1
+GetEOF = EOFmas
+End Function

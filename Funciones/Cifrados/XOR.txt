@@ -1,0 +1,17 @@
+'SOLO STRING, NO FICHEROS
+
+Public Function XORizo(St As String, Sp As String)
+Dim Sr As String, StI As String, SpP As String
+Dim i As Integer, p As Integer
+p = 1
+For i = 1 To Len(St)
+ StI = Mid(St, i, 1)
+ SpP = Mid(Sp, p, 1)
+ Sr = Sr & Chr((Asc(StI) Xor Len(St)) Xor (Asc(SpP) Xor Len(Sp)))
+ p = p + 1
+If p > Len(Sp) Then
+ p = 1
+End If
+Next i
+ XORizo = Sr
+End Function

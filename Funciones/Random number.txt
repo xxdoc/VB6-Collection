@@ -1,0 +1,6 @@
+Private Sub Form_Load()
+  Dim Num As Double
+  Randomize
+  Num = Rnd
+  MsgBox Num
+End Sub

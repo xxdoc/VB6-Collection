@@ -1,0 +1,100 @@
+'-----------------------------------------------------------
+'Autor: Danyfirex|Pink
+'Uso:
+'Debug.Print URLEncode("https://www.google.com.ar/search?q=canción")
+'Debug.Print URLDecode(URLEncode("https://www.google.com.ar/search?q=canción"))
+'Gracias Cobein-UEZ
+'-----------------------------------------------------------
+ 
+Private Declare Function WideCharToMultiByte Lib "KERNEL32" (ByVal CodePage As Long, ByVal dwFlags As Long, ByVal lpWideCharStr As Long, ByVal cchWideChar As Long, ByRef lpMultiByteStr As Any, ByVal cchMultiByte As Long, ByVal lpDefaultChar As String, ByVal lpUsedDefaultChar As Long) As Long
+Private Declare Function MultiByteToWideChar Lib "KERNEL32" (ByVal CodePage As Long, ByVal dwFlags As Long, ByRef lpMultiByteStr As Any, ByVal cchMultiByte As Long, ByVal lpWideCharStr As Long, ByVal cchWideChar As Long) As Long
+Private Const CP_UTF8                           As Long = 65001
+  
+  
+  
+Function URLEncode(url As String) As String
+Dim sp() As Byte
+Dim final As String
+  
+sp() = StrConv(Unicode2UTF8(url), vbFromUnicode)
+  
+For i = 0 To UBound(sp)
+  
+Select Case sp(i)
+  
+    Case 45, 46, 48 To 57, 65 To 90, 95, 97 To 122, 126
+         final = final & Chr(sp(i))
+  
+    Case 32
+        final = final & "+"
+  
+   Case Else
+           final = final & "%" & Hex(sp(i))
+End Select
+  
+Next
+URLEncode = final
+End Function
+  
+Function URLDecode(url As String) As String
+Dim spl() As String
+Dim final As String
+Dim str As String
+str = Replace(url, "+", " ")
+spl() = Split(str, "%")
+final = spl(0)
+For i = 1 To UBound(spl)
+final = final & Chr(CLng("&H" & Left(spl(i), 2))) & Mid(spl(i), 3)
+Next
+URLDecode = UTF82Unicode(final)
+End Function
+  
+  
+  
+Private Function UTF82Unicode(ByVal sUTF8 As String) As String
+  
+    Dim UTF8Size As Long
+    Dim BufferSize As Long
+    Dim BufferUNI As String
+    Dim LenUNI As Long
+    Dim bUTF8() As Byte
+  
+    If LenB(sUTF8) = 0 Then Exit Function
+  
+    bUTF8 = StrConv(sUTF8, vbFromUnicode)
+    UTF8Size = UBound(bUTF8) + 1
+  
+    BufferSize = UTF8Size * 2
+    BufferUNI = String$(BufferSize, vbNullChar)
+  
+    LenUNI = MultiByteToWideChar(CP_UTF8, 0, bUTF8(0), UTF8Size, StrPtr(BufferUNI), BufferSize)
+  
+    If LenUNI Then
+        UTF82Unicode = Left$(BufferUNI, LenUNI)
+    End If
+  
+End Function
+  
+  
+Private Function Unicode2UTF8(ByVal strUnicode As String) As String
+  
+    Dim LenUNI As Long
+    Dim BufferSize As Long
+    Dim LenUTF8 As Long
+    Dim bUTF8() As Byte
+  
+    LenUNI = Len(strUnicode)
+  
+    If LenUNI = 0 Then Exit Function
+  
+    BufferSize = LenUNI * 3 + 1
+    ReDim bUTF8(BufferSize - 1)
+  
+    LenUTF8 = WideCharToMultiByte(CP_UTF8, 0, StrPtr(strUnicode), LenUNI, bUTF8(0), BufferSize, vbNullString, 0)
+  
+    If LenUTF8 Then
+        ReDim Preserve bUTF8(LenUTF8 - 1)
+        Unicode2UTF8 = StrConv(bUTF8, vbUnicode)
+    End If
+  
+End Function

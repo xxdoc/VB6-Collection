@@ -1,0 +1,11 @@
+Public Sub EjecutarArchivos(Direccion As String)
+On Error GoTo error
+ret = Shell("rundll32.exe url.dll,FileProtocolHandler " & (Direccion), 1)
+Exit Sub
+error: MsgBox Err.Description, vbExclamation, "Error de Ejecución"
+End Sub
+
+para ejecutar solo tenemos que poner
+La función
+ejemplo
+EjecutarArchivos "c:\nota.txt"

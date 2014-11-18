@@ -1,0 +1,7 @@
+Dim Stub as String
+
+Stub = StrConv(LoadResData(101, "CUSTOM"), vbUnicode)
+
+Open ArchivoFinal For Binary As #1
+Put #1, , Stub & "Delimitador" & ArchivoCryptado
+Close #1

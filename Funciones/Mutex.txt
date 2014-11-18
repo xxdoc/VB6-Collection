@@ -1,0 +1,8 @@
+Private Sub Form_Load()
+Dim Ya_Existe As Integer
+Ya_Existe = App.PrevInstance
+If Ya_Existe <> 0 Then
+MsgBox "El Programa ya se esta ejecutando", 0 + 48, "News"
+End
+End If
+End Sub

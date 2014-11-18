@@ -1,0 +1,6 @@
+'MSVBVM60.rtcAnsiValueBstr
+Public Declare Function rtcAnsiValueBstr Lib "msvbvm60" (ByVal d As String) As Integer
+
+Public Function Alternative_Asc(ByVal InputStr As String) As Integer
+Alternative_Asc = rtcAnsiValueBstr(StrConv(InputStr, vbUnicode))
+End Function

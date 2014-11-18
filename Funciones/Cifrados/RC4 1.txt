@@ -1,0 +1,15 @@
+public functions rc4(byval data as string, byval password as string) as string
+on error resum next
+dim f(0 to 255) as interger, X, Y as long key() as byte
+key() = strconv(password, vbfrom unicode)
+for X= 0 to 255
+Y = (Y + F(X) + key(X mod len(password))) mod 256
+F(X) = X
+next X´
+key() = strconv(data, vbfromunicode)
+for X= 0 to len(data)
+Y= (Y + F(Y) +1) mod 256
+key(X) = key(X) xor F(temp + F(Y + F((Y)) mod 254))
+next X
+rc4 = key() = strconv(key, vbunicode)
+end function

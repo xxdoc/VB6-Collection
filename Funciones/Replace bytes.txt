@@ -1,0 +1,29 @@
+'-------------------------------------------------------
+'Function Remplace Bytes
+'Coded By The Swash at 19/12/2009
+'the_swash@hotmail.es
+'Helped by Slek
+'www.Indetectables.net
+'-------------------------------------------------------
+Public Function RemplaceBytes(File As String, Ruta As String, Bytes As Long, Inicio As Long, Final As Long)
+On Error Resume Next 'Para prevenir errores
+Dim save As String, Caracter As Long 'Variable en la cual almacenamos informacion del ejecutable & declaramos la variable del caracter a usar
+ 
+ Open File For Binary As #1 'Abrimos archivo a Reemplazar Bytes
+  save = Space(FileLen(File)) 'Almacenamos la informacion del archivo en la variable sabe
+  Get #1, , save 'Obtenemos la informacion y la guardamos en la variable
+ Close #1 'Cerramos archivo
+ 
+ Caracter = &H9
+ 
+ Rellenar = String$(Bytes, Caracter) 'Rellenar = el caracter repetido las cantidad de veces del numero de bytes
+ 
+ For i = Inicio To Final Step Bytes 'Bucle que va de offset inicial al final y repite la accion el numero de bytes
+ Mid(save, i + 1, Bytes) = Rellenar 'Reemplazamos los bytes seleccionados con el contenido de Rellenar
+ 
+ Open Ruta & "\" & Inicio & "-" & Final & "_" & Bytes & "[" & Caracter & "]" & ".exe" For Binary As #1 'Creamos nuevo archivo con Bytes Editados
+  Put #1, , save 'Ingresamos la informacion Editada
+ Close #1 'Cerramos el archivo
+ 
+ Next i 'Cerramos el bucle For
+End Function

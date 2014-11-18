@@ -1,0 +1,15 @@
+'---------------------------------------------
+' Addbytes
+' Autor: Pink
+' Fecha: 14-02-2013
+' Propósito: Agregar bytes a archivos
+' Uso : Call AddBytes("C:\Users\CENTRAL\Desktop\1.txt", 1)
+'---------------------------------------------
+ 
+ 
+Private Function AddBytes(FilePath As String, NBytes As Long, Optional kb As Long = False)
+If kb = True Then kb = 1024 Else kb = 1
+Open FilePath For Binary As #1
+Put #1, LOF(1) + NBytes * kb, CByte(&H0)
+Close #1
+End Function

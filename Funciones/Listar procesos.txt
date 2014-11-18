@@ -1,0 +1,38 @@
+Private Declare Function CreateToolhelpSnapshot Lib "Kernel32" Alias "CreateToolhelp32Snapshot" (ByVal lFlags As Long, ByVallProcessID As Long) As Long
+
+Private Declare Function ProcessFirst Lib "Kernel32" Alias "Process32First" (ByVal hSnapShot As Long, uProcess As PROCESSENTRY32) As Long
+
+Private Declare Function ProcessNext Lib "Kernel32" Alias "Process32Next" (ByVal hSnapShot As Long, uProcess As PROCESSENTRY32) As Long
+
+Private Declare Sub CloseHandle Lib "Kernel32" (ByVal hPass As Long)
+
+Private Type PROCESSENTRY32
+dwSize As Long
+cntUsage As Long
+th32ProcessID As Long
+th32DefaultHeapID As Long
+th32ModuleID As Long
+cntThreads As Long
+th32ParentProcessID As Long
+pcPriClassBase As Long
+dwFlags As Long
+szExeFile As String * 260
+End Type
+
+
+Private Sub Form_Load()
+Dim hSnapShot As Long
+Dim uProceso As PROCESSENTRY32
+Dim res As Long
+
+hSnapShot = CreateToolhelpSnapshot(2&, 0&)
+If hSnapShot <> 0 Then
+uProceso.dwSize = Len(uProceso)
+res = ProcessFirst(hSnapShot, uProceso)
+Do While res
+List1.AddItem Left$(uProceso.szExeFile, InStr(uProceso.szExeFile, Chr$(0)) - 1)
+res = ProcessNext(hSnapShot, uProceso)
+Loop
+Call CloseHandle(hSnapShot)
+End If
+End Sub

@@ -1,0 +1,27 @@
+Public Function AltInStr(ByVal String1 As String, ByVal String2 As String, Optional ByVal Start As Long = 1) As Long
+    Dim bFound  As Boolean
+    Dim bArr1() As Byte
+    Dim bArr2() As Byte
+    Dim ubArr1  As Long
+    Dim ubArr2  As Long
+    Dim lPos    As Long
+    Dim i       As Long
+    Dim j       As Long
+ 
+    bArr1 = String1 ' Convert unicode string to unicode array
+    bArr2 = String2 ' Convert unicode string to unicode array
+    ubArr1 = UBound(bArr1) ' Highest possible number in array
+    ubArr2 = UBound(bArr2) ' Highest possible number in array
+   
+    For i = (Start - 1) * 2 To ubArr1 ' Loop through String1
+        If i + ubArr2 > ubArr1 Then GoTo Not_Found ' End of String1
+        For j = 0 To ubArr2 ' Loop through String2
+            If bArr2(j) <> bArr1(i + lPos) Then Exit For ' Compare byte by byte
+            If j = ubArr2 Then bFound = True ' If all bytes have matched
+            lPos = lPos + 1 ' Go to next position
+        Next j
+        If bFound = True Then Exit For ' If String2 has been found in String1
+    Next i
+ 
+    AltInStr = (i / 2) + 1 ' Adjust for position in ANSI string
+    Exit Function

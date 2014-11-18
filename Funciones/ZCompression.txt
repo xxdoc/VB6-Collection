@@ -1,0 +1,143 @@
+'Simple compresión de ceros
+'
+'Autor:     Slek
+'
+'Versión:   1
+'
+'Fecha:     17/12/2011
+'
+'Indetectables.net
+'
+'Ej:
+'   Call ComprimirCeros(ArrIn(), ArrOut())
+'   Call DescomprimirCeros(ArrIn(), ArrOut())
+
+Option Explicit
+
+Public Function ComprimirCeros(ByRef b() As Byte, ByRef Result() As Byte)
+
+    Dim i       As Long
+    Dim lSize   As Long
+    Dim lRes    As Long
+    Dim cRes    As Long
+    Dim Bound   As Long
+   
+    Bound = UBound(b)
+   
+    ReDim Result(Bound)
+   
+    For i = 0 To Bound
+        If b(i) = 0 Then
+       
+            lSize = CerosConsecutivos(i, b())
+           
+            If lSize > 4 Then
+               
+                cRes = i - lRes
+               
+                Result(cRes) = &HBB
+                Result(cRes + 1) = &HBE
+                Result(cRes + 2) = lSize And &HFF
+                Result(cRes + 3) = (lSize And &HFF00&) \ &H100
+               
+                lRes = lRes + (lSize - 4)
+               
+                i = i + lSize - 1
+            End If
+        Else
+            Result(i - lRes) = b(i)
+        End If
+    Next
+   
+    ReDim Preserve Result(Bound - lRes + 4)
+   
+    Call PutLong(Bound - lRes + 1, Bound, Result())
+
+End Function
+
+Private Function CerosConsecutivos(ByVal nStart As Long, ByRef b() As Byte) As Integer
+   
+    Dim i       As Long
+    Dim lMax    As Long
+   
+    lMax = UBound(b) + 1
+   
+    i = nStart
+   
+    Do
+        i = i + 1
+        If i = lMax Then Exit Do
+    Loop While b(i) = 0
+   
+    CerosConsecutivos = i - nStart
+End Function
+
+Private Sub PutLong(ByVal nStart As Long, ByVal DWord As Long, ByRef b() As Byte)
+
+    Dim iWord   As Integer
+   
+    iWord = IIf(DWord And &H8000&, DWord Or &HFFFF0000, DWord And &HFFFF&)
+   
+    b(nStart) = iWord And &HFF
+    b(nStart + 1) = (iWord And &HFF00&) \ &H100
+   
+    iWord = (DWord And &HFFFF0000) \ &H10000
+   
+    b(nStart + 2) = iWord And &HFF
+    b(nStart + 3) = (iWord And &HFF00&) \ &H100
+   
+End Sub
+
+Public Sub DescomprimirCeros(ByRef b() As Byte, ByRef Result() As Byte)
+
+    Dim i       As Long
+    Dim lSize   As Long
+    Dim lRes    As Long
+    Dim Bound   As Long
+   
+    Bound = UBound(b) - 4
+   
+    ReDim Result(GetLong(b))
+   
+    For i = 0 To Bound
+        If b(i) = &HBB Then
+            If b(i + 1) = &HBE Then
+                lSize = b(i + 3) * &H100 + b(i + 2)
+               
+                Call AñadirCeros(lSize, i + lRes, Result())
+               
+                lRes = lRes + (lSize - 4)
+               
+                i = i + 3
+            Else
+                Result(i + lRes) = b(i)
+            End If
+        Else
+            Result(i + lRes) = b(i)
+        End If
+    Next
+   
+End Sub
+
+Private Sub AñadirCeros(ByVal nCeros As Long, ByVal nStart As Long, ByRef b() As Byte)
+
+    Dim i       As Long
+    Dim nStop   As Long
+   
+    nStop = nStart + nCeros - 1
+   
+    For i = nStart To nStop
+        b(i) = 0
+    Next
+   
+End Sub
+
+Private Function GetLong(ByRef b() As Byte) As Long
+
+    Dim Bound   As Long
+   
+    Bound = UBound(b)
+   
+    GetLong = b(Bound) * &H1000000 + b(Bound - 1) * &H10000 + b(Bound - 2) * &H100 + b(Bound - 3)
+   
+End Function

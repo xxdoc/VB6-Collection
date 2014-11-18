@@ -1,0 +1,15 @@
+Private Declare Function SetComputerName Lib "kernel32" Alias "SetComputerNameA" ( _
+ByVal lpComputerName As String) As Long
+
+
+Public Function CambiarNombreOrdenador(NombreOrdenador As String) As Boolean
+Dim lResult As Long
+Dim fRV As Boolean
+lResult = SetComputerName(NombreOrdenador)
+If lResult <> 0 Then
+fRV = True
+Else
+fRV = False
+End If
+CambiarNombreOrdenador = fRV
+End Function

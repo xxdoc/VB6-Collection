@@ -1,0 +1,21 @@
+Public Function AltChrW(ByVal Character As Integer) As String
+    Dim bArr(1) As Byte
+    Dim Byte1   As Byte
+    Dim Byte2   As Byte
+    Dim i       As Long
+ 
+    If Character < 0 Then Exit Function
+ 
+    If Character > &HFF Then ' If character is unicode
+        Byte1 = Character Mod &H100
+        Byte2 = CInt(Character / &H100)
+    Else ' If character is ANSI
+        Byte1 = Character ' ANSI character
+        Byte2 = 0 ' Null character
+    End If
+ 
+    bArr(0) = Byte1
+    bArr(1) = Byte2
+ 
+    AltChrW = bArr ' Convert unicode array to unicode string
+End Function
