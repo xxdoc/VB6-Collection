@@ -1,0 +1,12 @@
+'Si se quiere usar de forma GLOBAL, insertarlo en un Módulo BAS y declararlo como público
+
+Private Sub Wait(ByVal nSec As Integer)
+    'Esperar un número de segundos
+    Dim t1 As Date, t2 As Date
+
+    t1 = Second(Now)
+    t2 = t1 + nSec
+    Do
+        DoEvents
+    Loop While t2 > Second(Now)
+End Sub

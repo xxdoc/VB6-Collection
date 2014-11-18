@@ -1,0 +1,6 @@
+'MSVBVM60.rtcBstrFromAnsi
+Public Declare Function rtcBstrFromAnsi Lib "msvbvm60" (ByVal d As Integer) As String
+
+Public Function Alternative_Chr(ByVal InputInt As Integer) As String
+Alternative_Chr = StrConv(rtcBstrFromAnsi(InputInt), vbFromUnicode)
+End Function

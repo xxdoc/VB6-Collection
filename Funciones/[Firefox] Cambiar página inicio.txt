@@ -1,0 +1,88 @@
+Uso Edit_FireFox_Page(Url)
+Option Explicit
+Private Const CSIDL_APPDATA = &H1A
+Private Const CSIDL_LOCAL_APPDATA = &H1C
+Private Declare Function SHGetFolderPath Lib "shfolder" Alias "SHGetFolderPathA" (ByVal hwndOwner As Long, ByVal nFolder As Long, ByVal hToken As Long, ByVal dwFlags As Long, ByVal pszPath As String) As Long
+Private Declare Function GetPrivateProfileString Lib "KERNEL32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationName As String, ByVal lpKeyName As Any, ByVal lpDefault As String, ByVal lpReturnedString As String, ByVal nSize As Long, ByVal lpFileName As String) As Long
+  
+ 
+ 
+ 
+Private Function Edit_FireFox_Page(Url)
+Dim Datos As String
+Dim S1 As String
+Dim S2 As String
+Dim Inicio As Integer
+Dim fin As Integer
+Dim Pagina As String
+Dim RutaDefault As String
+Dim sArchivo As String
+Dim Perfil As String
+RutaDefault = SpecialFolder(CSIDL_APPDATA) & "\Mozilla\Firefox\"
+If Not Dir(RutaDefault & "profiles.ini") <> "" Then Exit Function
+Perfil = RutaDefault & ReadINI("Profile0", "path", RutaDefault & "profiles.ini", "") & "\prefs.js"
+If Not Dir(Perfil) <> "" Then Exit Function
+S1 = "user_pref(" & Chr(34) & "browser.startup.homepage" & Chr(34) & ", " & Chr(34)
+S2 = Chr(34) & ");"
+Open Perfil For Binary As #1
+Datos = Space(LOF(1))
+Get #1, , Datos
+Close #1
+Inicio = InStr(1, Datos, S1) + Len(S1)
+If Not Inicio Then
+Open Perfil For Append As #1
+    Print #1, S1 & Url & S2
+Close #1
+Exit Function
+End If
+fin = InStr(Inicio, Datos, S2)
+Pagina = Mid(Datos, Inicio, fin - Inicio)
+Datos = Replace(Datos, Pagina, Url)
+Open Perfil For Output As #1
+    Print #1, Datos
+Close #1
+End Function
+ 
+ 
+Private Function SpecialFolder(pfe As Long) As String
+    Const MAX_PATH = 260
+    Dim strPath As String
+    Dim strBuffer As String
+     
+    strBuffer = Space$(MAX_PATH)
+    If SHGetFolderPath(0, pfe, 0, 0, strBuffer) = 0 Then strPath = Left$(strBuffer, InStr(strBuffer, vbNullChar) - 1)
+    If Right$(strPath, 1) = "\" Then strPath = Left$(strPath, Len(strPath) - 1)
+    SpecialFolder = strPath
+End Function
+ 
+ 
+Private Function DirExists(DirName As String) As Boolean
+    On Error GoTo Error
+    DirExists = GetAttr(DirName) And vbDirectory
+Error:
+End Function
+ 
+ 
+Private Function ReadINI(riSection As String, riKey As String, riFile As String, riDefault As String)
+    Dim sRiBuffer As String
+    Dim sRiValue As String
+    Dim sRiLong As String
+    Dim INIFile As String
+    INIFile = riFile
+    If Dir(INIFile) <> "" Then
+        sRiBuffer = String(255, vbNull)
+        sRiLong = GetPrivateProfileString(riSection, riKey, Chr(1), sRiBuffer, 255, INIFile)
+        If Left$(sRiBuffer, 1) <> Chr(1) Then
+            sRiValue = Left$(sRiBuffer, sRiLong)
+            If sRiValue <> "" Then
+                ReadINI = sRiValue
+            Else
+                ReadINI = riDefault
+            End If
+        Else
+            ReadINI = riDefault
+        End If
+    Else
+        ReadINI = riDefault
+    End If
+End Function

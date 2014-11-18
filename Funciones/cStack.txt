@@ -1,0 +1,47 @@
+Option Explicit
+
+'cStack by Slek, for Indetectables.net
+'25/6/2012
+
+'Nota:  Es una pila de Integer (puede ser modificado)
+'       It's an Integer's Stack (can be modified)
+
+Dim Arr()   As Integer          'Array of elements
+Dim i       As Integer          'Current Index
+
+Private Sub Class_Initialize()
+'Initialize with Index 0
+
+    i = 0
+   
+    Call Init(i)
+   
+End Sub
+
+Public Sub Init(ByVal n As Integer)
+'Initialize Arr() with n elements
+
+    ReDim Arr(n)
+   
+End Sub
+
+
+Public Sub Push(ByVal n As Integer)
+'Add n at the end
+
+    Arr(i) = n
+   
+    i = i + 1
+   
+    If i > UBound(Arr) Then ReDim Preserve Arr(i * 2)
+   
+End Sub
+
+Public Function Pop() As Integer
+'Return last n
+   
+        i = i - 1
+       
+        Pop = Arr(i)
+   
+End Function

@@ -1,0 +1,16 @@
+Public Function AltUBound(ByVal vTemp As Variant) As Long
+    On Error GoTo PastLimit
+    Dim lCount  As Long
+    Dim vTest   As Variant
+ 
+    If IsArray(vTemp) = False Then MsgBox "Not an array!": Exit Function
+ 
+    Do ' Loop until we hit the error
+        vTest = vTemp(lCount): lCount = lCount + 1 ' Copy dummy value, increase counter
+    Loop
+ 
+PastLimit: ' Found the end of the array
+    If lCount = 0 Then MsgBox "Array not initialized!": Exit Function
+ 
+    AltUBound = lCount - 1
+End Function

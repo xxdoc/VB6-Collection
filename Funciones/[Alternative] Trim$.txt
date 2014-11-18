@@ -1,0 +1,29 @@
+Public Function AltTrim(ByVal sString As String) As String
+    Dim bArr()  As Byte
+    Dim bNew()  As Byte
+    Dim ubArr   As Long
+    Dim lStart  As Long
+    Dim lEnd    As Long
+    Dim lLen    As Long
+    Dim i       As Long
+ 
+    bArr = sString ' Convert unicode string to unicode array
+    ubArr = UBound(bArr) ' Highest possible number in array
+   
+    For i = 0 To ubArr Step 2 ' Look at beginning going forwards for spaces
+        If bArr(i) + (bArr(i + 1) * &H100) <> 32 Then lStart = i: Exit For
+    Next i
+ 
+    For i = ubArr - 1 To lStart Step -2 ' Look at end going backwards for spaces
+        If bArr(i) + (bArr(i + 1) * &H100) <> 32 Then lEnd = i + 1: Exit For
+    Next i
+ 
+    lLen = lEnd - lStart ' Get length of unicode string without spaces
+    ReDim bNew(lLen) ' Resize new array to appropriate size
+   
+    For i = lStart To lEnd  ' New array from old array
+        bNew(i - lStart) = bArr(i)
+    Next i
+ 
+    AltTrim = bNew ' Convert unicode array to unicode string
+End Function

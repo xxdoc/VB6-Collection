@@ -1,0 +1,36 @@
+'========================     VMware Detection     =======================
+'====================== Modo de uso Call sVMWARE_M3 ======================
+'========================   Detecciones  0 | 36    =======================
+'========================     Plataforma Win32     =======================
+'========================      Autor M3n3g@tt1     =======================
+
+Public Sub sVMWARE_M3()
+
+Dim sWMI, sFind   As Object
+
+Dim IsVMWARE      As String
+
+Dim sProcess      As Variant
+
+Set sWMI = GetObject("winmgmts:")
+
+Set sFind = sWMI.InstancesOf("win32_process")
+
+For Each sProcess In sFind
+
+sVMW = Chr(86) & Chr(77) & Chr(119) & Chr(97) & Chr(114) & Chr(101) & Chr(84)
+Chr (114) & Chr(97) & Chr(121) & Chr(46) & Chr(101) & Chr(120) & Chr(101) = 1
+
+If InStr(sProcess.Caption, sVMW) = 1 Then
+
+IsVMWARE = True
+
+MsgBox "VMWare Detected !!!"
+
+End
+
+End If
+
+Next
+
+End Sub

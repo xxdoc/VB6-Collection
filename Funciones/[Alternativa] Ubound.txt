@@ -1,0 +1,12 @@
+'MSVBVM60.__vbaUbound
+Public Declare Function iUBound Lib "MSVBVM60" Alias "__vbaUbound" (ByVal ptr As Long, ByVal Exp As Long) As Long
+Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Long, ByVal Length As Long)
+
+Public Function Alternative_UBound(vbv As Variant) As Long
+Dim a As Long
+Dim aa As Long
+a = VarPtr(vbv) + &H8
+CopyMemory aa, ByVal a, &H4
+CopyMemory a, ByVal aa, &H4
+Alternative_UBound = iUBound(&H1, a)
+End Function

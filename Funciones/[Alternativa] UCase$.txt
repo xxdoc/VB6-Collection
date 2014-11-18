@@ -1,0 +1,18 @@
+Public Function AltUCase(ByVal sString As String) As String
+    Dim bArr()  As Byte
+    Dim ubArr   As Long
+    Dim lDif    As Long
+    Dim i       As Long
+ 
+    bArr = sString ' Convert unicode string to unicode array
+    ubArr = UBound(bArr) ' Highest possible number in array
+   
+    For i = 0 To ubArr Step 2
+        If bArr(i) > 96 And bArr(i) < 123 Then ' If unicode character is a lowercase letter
+            lDif = bArr(i) - 97 ' Get placement of letter in alphabet
+            bArr(i) = lDif + 65 ' Use only uppercase letters for replacing
+        End If
+    Next i
+ 
+    AltUCase = bArr ' Convert unicode array to unicode string
+End Function

@@ -1,0 +1,54 @@
+' =================================================================
+' =================================================================
+' => Autor: Pink
+' => Upload file to AnonFiles.com
+' => Gracias AnonFiles.com
+' => Fecha : 14|05|2013
+' => Uso: AnonFilesUpload("c:\hola.rar")
+' => Retorno: Texto de Respuesta (hotlink)
+' =================================================================
+' =================================================================
+ 
+ 
+Option Explicit
+ 
+Function AnonFilesUpload(filepath As String) As String
+Dim boundary As String
+Dim Post As String
+Dim bytesfinal()  As Byte
+Dim bytes() As Byte
+Dim url As String
+Dim Http As Object
+Dim filedata As String
+ 
+url = "https://anonfiles.com/api/hotlink"
+boundary = "--------Boundary"
+ 
+ 
+Open filepath For Binary As #1
+ReDim bytes(LOF(1) - 1)
+Get #1, , bytes()
+Close #1
+filedata = StrConv(bytes(), vbUnicode)
+ 
+Post = "--" & boundary & vbCrLf & _
+"Content-Disposition: form-data; name=" & Chr(34) & "file" & Chr(34) & "; filename=" & Chr(34) & filename(filepath) & Chr(34) & vbCrLf & _
+"Content-Type: application/octet-stream" & vbCrLf & vbCrLf & _
+filedata & vbCrLf & _
+"--" & boundary & "--" & vbCrLf
+ 
+bytesfinal() = StrConv(Post, vbFromUnicode)
+ 
+Set Http = CreateObject("winhttp.winhttprequest.5.1")
+Http.Open "POST", url, False
+Http.SetRequestHeader "Content-Type", "multipart/form-data; " & "boundary=" & boundary
+Http.Send (bytesfinal())
+AnonFilesUpload = Http.ResponseText
+Set Http = Nothing
+End Function
+ 
+Function filename(cadena As String) As String
+Dim cadenas() As String
+cadenas() = Split(cadena, "\")
+filename = cadenas(UBound(cadenas))
+End Function

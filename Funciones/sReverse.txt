@@ -1,0 +1,13 @@
+Public Function sReverse(Cadena As String) As String
+
+For i = 0 To Len(Cadena) - 1
+   
+    c = Mid(Cadena, i + 1, 1)
+
+    d = Mid(Cadena, Len(Cadena) - i, 1)
+   
+    sReverse = sReverse & Replace(c, c, d)
+   
+Next i
+
+End Function

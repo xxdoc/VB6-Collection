@@ -1,0 +1,20 @@
+'======================================
+' Autor : M3
+' Proposito : Sacar el Ip Externo
+' Uso : sMyIpAdress
+' Requiere Control Inet
+'======================================
+
+Public Function sMyIpAdress()
+
+
+ Dim sUrl As String, sDados() As String
+   
+    sUrl = Inet1.OpenURL("http://meuip.net/")
+    sDados = Split(sUrl, Chr(10))
+    sMyIpAdress = Replace(sDados(45), "</h1></td>", "")
+    MsgBox sMyIpAdress
+ 
+ End
+
+End Function

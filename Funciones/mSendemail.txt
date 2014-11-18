@@ -1,0 +1,77 @@
+Option Explicit
+
+'-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+' Module    : mSendEmail
+' Author    : Skyweb07
+' Email     : Skyweb09@hotmail.es
+' Date      : 10/09/2009
+' Purpose   : Send Email with Microsoft CDO
+'
+' Credits   : Is a Modification of a Class Module From http://www.recursosvisualbasic.com.ar/htm/trucos-codigofuente-visual-basic/337-enviar-correo-en-vb-con-microsoft-cdo.htm
+'
+' Usage :   MsgBox SendEmail("smtp.gmail.com", "skyweb09@hotmail.es", "The_Ghost_Of_Network@fbi.gob", _
+'           "Hello World ;)", "Look at your back and you'll see me ", 465, "test@gmail.com", "test123", "The File Path", True, True)
+'
+'-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Public Function SendEmail(hServer As String, hTo As String, hFrom As String, hSubject As String, hMenssage As String, hPort As Integer, hUsername As String, hPassword As String, hAttachments As String, hAuthenticate As Boolean, hUseSSL As Boolean) As Boolean
+
+Dim hSend As Object, hURL As String
+
+hURL = "http://schemas.microsoft.com/cdo/"
+
+If IsNumeric(hPort) Then
+
+Set hSend = CreateObject("CDO.Message")
+
+With hSend.configuration
+
+.Fields(hURL & "configuration/smtpserver") = hServer
+.Fields(hURL & "configuration/sendusing") = 2
+.Fields.Item(hURL & "configuration/smtpserverport") = hPort
+.Fields.Item(hURL & "configuration/smtpauthenticate") = CBool(hAuthenticate)
+.Fields.Item(hURL & "configuration/smtpconnectiontimeout") = 10
+       
+If hAuthenticate Then
+
+.Fields.Item(hURL & "configuration/sendusername") = hUsername
+.Fields.Item(hURL & "configuration/sendpassword") = hPassword
+.Fields.Item(hURL & "configuration/smtpusessl") = CBool(hUseSSL)
+
+End If
+
+End With
+
+With hSend
+
+.to = hTo
+.From = hFrom
+.Subject = hSubject
+.TextBody = hMenssage
+
+If hAttachments <> vbNullString Then
+
+If Dir$(hAttachments) <> vbNullString Then
+
+.AddAttachment hAttachments
+
+End If
+
+End If
+
+.configuration.Fields.Update
+.Send
+
+End With
+
+If Err.Number = 0 Then
+SendEmail = True
+Else
+SendEmail = False
+End If
+
+If Not hSend Is Nothing Then Set hSend = Nothing
+
+End If
+
+End Function

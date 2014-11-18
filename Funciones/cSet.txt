@@ -1,0 +1,60 @@
+Option Explicit
+
+'cSet by Slek, for Indetectables.net
+'31/5/2012
+
+'Nota:  Es un conjunto de Integer (puede ser modificado)
+'       It's an Integer's Set (can be modified)
+
+Dim Arr()   As Integer          'Array of elements
+Dim s       As Integer          'Number of elements included
+
+Private Sub Class_Initialize()
+'Initialize with 0 elements
+
+    s = 0
+   
+End Sub
+
+Public Sub Add(ByVal n As Integer)
+'Include n
+
+    If Not Contains(n) Then
+        ReDim Preserve Arr(s)
+        Arr(s) = n
+        s = s + 1
+    End If
+   
+End Sub
+
+Public Function Size() As Integer
+'Return number of elements
+   
+    Size = s
+   
+End Function
+
+Public Function Contains(ByVal n As Integer) As Boolean
+'Returns if n has already been included
+
+    Dim i As Integer
+   
+    For i = 0 To (s - 1)
+   
+        If Arr(i) = n Then
+            Contains = True
+            Exit Function
+        End If
+       
+    Next i
+   
+    Contains = False
+   
+End Function
+
+Public Function toArray() As Integer()
+'Return Array
+
+    toArray = Arr
+   
+End Function

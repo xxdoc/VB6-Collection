@@ -1,0 +1,7 @@
+Function sLen(sStr As String) As Long
+Dim A() As Byte
+
+A = sStr
+
+sLen = (UBound(A) + 1) / 2
+End Function
